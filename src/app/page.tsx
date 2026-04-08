@@ -1,11 +1,22 @@
-
+import Info from "@/components/info";
+import About from "@/components/about";
+import Experience from "@/components/experience";
+import Projects from "@/components/projects";
+import Photos from "@/components/photos";
+import { StaggerContainer } from "@/components/stagger-container";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        Hello World
-      </main>
-    </div>
+    <StaggerContainer className="min-h-screen grid grid-cols-1 md:grid-cols-3 gap-8 pt-10 pb-20 max-w-4xl mx-auto">
+
+      <Info />
+
+      <div className="flex flex-col gap-8 md:col-span-2">
+        <About />
+        <Experience />
+        <Projects />
+        <Photos />
+      </div>
+    </StaggerContainer>
   );
 }
