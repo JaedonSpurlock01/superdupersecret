@@ -121,9 +121,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
@@ -134,6 +136,7 @@
     opacity: 0;
     transform: translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: none;
@@ -144,4 +147,75 @@
   opacity: 0;
   transform: translateY(12px);
   animation: fade-in-up 0.5s ease-out both;
+}
+
+/* Match MapLibre controls to dark UI theme. */
+.map-dark .maplibregl-ctrl-group {
+  background-color: oklch(0.205 0 0 / 88%);
+  border: 1px solid oklch(1 0 0 / 18%);
+  box-shadow: 0 2px 12px oklch(0 0 0 / 35%);
+}
+
+.map-dark .maplibregl-ctrl button {
+  color: oklch(0.985 0 0);
+}
+
+.map-dark .maplibregl-ctrl-group button + button {
+  border-top: 1px solid oklch(1 0 0 / 18%);
+}
+
+.map-dark .maplibregl-ctrl-icon {
+  filter: invert(1) brightness(1.25);
+}
+
+.map-dark .maplibregl-ctrl button:hover {
+  background-color: oklch(1 0 0 / 10%);
+}
+
+.map-dark .maplibregl-ctrl button:disabled {
+  color: oklch(0.708 0 0);
+}
+
+.map-dark .maplibregl-ctrl button:disabled .maplibregl-ctrl-icon {
+  filter: invert(1) brightness(0.8);
+}
+
+@layer components {
+  .blog-prose h2,
+  .blog-prose h3,
+  .blog-prose h4 {
+    scroll-margin-top: 6rem;
+  }
+
+  .blog-prose :where(ul, ol) > li::marker {
+    color: var(--color-muted-foreground);
+  }
+
+  /* Fenced `pre > code` must not use inline-code chips (bg/padding) from MDX or prose. */
+  .blog-prose pre > code {
+    background-color: transparent !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    font-size: inherit !important;
+    font-weight: 400;
+    color: inherit;
+  }
+
+  /*
+   * MDX + rehype-pretty-code: tokens use `--shiki-light` / `--shiki-dark` without a `color` property.
+   * Compiled JSX omits the `shiki` class on `<pre>`; scope via `data-language` from the highlighter instead.
+   */
+  html:not(.dark) .blog-prose pre[data-language] span[style] {
+    color: var(--shiki-light);
+  }
+
+  html.dark .blog-prose pre[data-language] span[style] {
+    color: var(--shiki-dark);
+  }
+
+  .blog-prose
+    figure[data-rehype-pretty-code-figure]
+    [data-rehype-pretty-code-title] {
+    @apply mb-2 rounded-t-sm border border-b-0 border-border bg-muted/60 px-3 py-1.5 font-mono text-xs font-medium text-muted-foreground;
+  }
 }

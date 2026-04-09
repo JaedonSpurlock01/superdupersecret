@@ -1,0 +1,448 @@
+---
+title: Building an HTTP Server from TCP Primitives in Go
+summary: A from-scratch tour of sockets, minimal HTTP/1.1 parsing, container images, Kubernetes deployment, and what it really takes to stress test at millions of requests per second.
+publishedAt: 2026-04-08
+tags:
+  - golang
+  - tcp
+  - http
+  - docker
+  - kubernetes
+  - benchmarking
+---
+
+Most production services use `net/http` or a framework on top of it. Peeling the stack back to raw TCP is useful anyway: you see exactly what the kernel gives you, what HTTP actually looks like on the wire, and where real servers spend their complexity (parsing edge cases, backpressure, HTTP/2, TLS). This post walks through a **minimal** HTTP/1.1 server built on `net` listeners and per-connection handlers, then packages it for **Docker** and **Kubernetes**, and closes with **how people benchmark at extreme request rates**—including what “millions of requests per second” implies in practice.
+
+> **Scope.** This is an educational server, not a security-hardened or standards-complete implementation. It intentionally skips pipelining, chunked encoding, trailers, upgrades, and HTTP/2. Treat it as a map of the territory, not something to expose to the open internet as-is.
+
+## 1. What “from TCP” means in Go
+
+At the lowest level you care about in userspace, a server:
+
+1. **Binds** an address and **listens** for inbound connections.
+2. **Accepts** each new connection (a connected socket pair between client and server).
+3. **Reads** bytes the client wrote, **parses** them as HTTP, and **writes** a response.
+4. **Closes** or reuses the connection per HTTP semantics.
+
+Go exposes this through `net.Listen`, `Listener.Accept`, and `net.Conn` (which is roughly “a bidirectional stream with `Read`, `Write`, `Close`, and deadlines”).
+
+```go
+package main
+
+import (
+	"log"
+	"net"
+)
+
+func main() {
+	ln, err := net.Listen("tcp", ":8080")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer ln.Close()
+
+	for {
+		conn, err := ln.Accept()
+		if err != nil {
+			log.Printf("accept: %v", err)
+			continue
+		}
+		go handle(conn) // one goroutine per connection — simple, not always optimal
+	}
+}
+```
+
+`Accept` blocks until a client completes the TCP handshake (or until you set deadlines on the listener—[`net.ListenConfig`](https://pkg.go.dev/net#ListenConfig) is the modern hook for that). Each `conn` is independent: buffering, partial reads, and stuck clients are now **your** problem.
+
+## 2. HTTP/1.1 as bytes on the wire
+
+A typical request looks like this on the wire (CRLF line endings matter):
+
+```text
+GET /hello HTTP/1.1\r\n
+Host: example.com\r\n
+User-Agent: demo\r\n
+\r\n
+```
+
+After the empty line, an optional **body** may follow for methods like `POST`, with length usually given by `Content-Length` (this tutorial keeps to simple `GET`/`HEAD` without bodies).
+
+A minimal response:
+
+```text
+HTTP/1.1 200 OK\r\n
+Content-Type: text/plain; charset=utf-8\r\n
+Content-Length: 13\r\n
+Connection: close\r\n
+\r\n
+Hello, world!
+```
+
+For keep-alive you would emit `Connection: keep-alive`, parse multiple requests on the same connection, and stop only when the client closes or times out.
+
+## 3. Reading headers: find `\r\n\r\n`
+
+The first job of a hand-rolled server is to accumulate bytes until you have seen the header terminator. In production code you would enforce a **maximum header size** (to avoid memory blowups) and use a bounded buffer or incremental parser. Below is the straightforward approach: grow a slice until the delimiter appears.
+
+```go
+import (
+	"bytes"
+	"io"
+	"net"
+)
+
+const maxHeaderBytes = 1 << 20 // 1 MiB — tune downward in real systems
+
+func readUntilHeaders(conn net.Conn) ([]byte, error) {
+	var buf bytes.Buffer
+	tmp := make([]byte, 4096)
+
+	for buf.Len() < maxHeaderBytes {
+		n, err := conn.Read(tmp)
+		if n > 0 {
+			buf.Write(tmp[:n])
+			if bytes.Contains(buf.Bytes(), []byte("\r\n\r\n")) {
+				return buf.Bytes(), nil
+			}
+		}
+		if err != nil {
+			if err == io.EOF && buf.Len() == 0 {
+				return nil, io.EOF
+			}
+			if err != io.EOF {
+				return buf.Bytes(), err
+			}
+			// EOF with partial data — malformed for HTTP/1.1 without Content-Length/body rules
+			return buf.Bytes(), io.ErrUnexpectedEOF
+		}
+	}
+	return nil, errTooLarge{}
+}
+
+type errTooLarge struct{}
+
+func (errTooLarge) Error() string { return "headers too large" }
+```
+
+## 4. Parsing the request line and `Host`
+
+Split headers at `\r\n\r\n`, then parse the first line as `METHOD SP PATH SP HTTP/1.1`. For a demo, ignore most headers except maybe `Host`.
+
+```go
+import (
+	"bufio"
+	"bytes"
+	"io"
+	"strings"
+)
+
+type requestLine struct {
+	Method string
+	Path   string
+}
+
+func parseRequest(raw []byte) (req requestLine, host string, err error) {
+	end := bytes.Index(raw, []byte("\r\n\r\n"))
+	if end < 0 {
+		return requestLine{}, "", io.ErrUnexpectedEOF
+	}
+	headerBlob := raw[:end]
+
+	s := bufio.NewScanner(bytes.NewReader(headerBlob))
+	s.Split(bufio.ScanLines)
+
+	if !s.Scan() {
+		return requestLine{}, "", io.ErrUnexpectedEOF
+	}
+	first := s.Text()
+	parts := strings.SplitN(first, " ", 3)
+	if len(parts) < 3 {
+		return requestLine{}, "", io.ErrUnexpectedEOF
+	}
+	method, path, proto := parts[0], parts[1], parts[2]
+	if !strings.HasPrefix(proto, "HTTP/") {
+		return requestLine{}, "", io.ErrUnexpectedEOF
+	}
+
+	for s.Scan() {
+		line := s.Text()
+		if line == "" {
+			break
+		}
+		k, v, ok := strings.Cut(line, ":")
+		if !ok {
+			continue
+		}
+		if strings.EqualFold(strings.TrimSpace(k), "Host") {
+			host = strings.TrimSpace(v)
+		}
+	}
+
+	return requestLine{Method: method, Path: path}, host, nil
+}
+```
+
+## 5. Writing a response and closing the connection
+
+For clarity this handler always responds with `Connection: close` and shuts down the TCP session after one request—easy to reason about, though not how high-throughput servers usually behave.
+
+```go
+import (
+	"fmt"
+	"net"
+	"strings"
+)
+
+func writeResponse(conn net.Conn, status int, body string) error {
+	statusText := httpStatusText(status)
+	var b strings.Builder
+	fmt.Fprintf(&b, "HTTP/1.1 %d %s\r\n", status, statusText)
+	fmt.Fprintf(&b, "Content-Type: text/plain; charset=utf-8\r\n")
+	fmt.Fprintf(&b, "Content-Length: %d\r\n", len(body))
+	fmt.Fprintf(&b, "Connection: close\r\n")
+	fmt.Fprintf(&b, "\r\n")
+	b.WriteString(body)
+
+	_, err := conn.Write([]byte(b.String()))
+	return err
+}
+
+func httpStatusText(code int) string {
+	switch code {
+	case 200:
+		return "OK"
+	case 400:
+		return "Bad Request"
+	case 404:
+		return "Not Found"
+	case 405:
+		return "Method Not Allowed"
+	default:
+		return "Error"
+	}
+}
+```
+
+## 6. Wiring `handle(conn)`
+
+```go
+import (
+	"io"
+	"log"
+	"net"
+	"strings"
+)
+
+func handle(conn net.Conn) {
+	defer conn.Close()
+
+	raw, err := readUntilHeaders(conn)
+	if err != nil {
+		return
+	}
+	req, host, err := parseRequest(raw)
+	if err != nil {
+		_ = writeResponse(conn, 400, "bad request\n")
+		return
+	}
+
+	switch req.Method {
+	case "GET", "HEAD":
+	default:
+		_ = writeResponse(conn, 405, "method not allowed\n")
+		return
+	}
+
+	// Tiny router
+	body := "hello from raw TCP\n"
+	if req.Path == "/version" {
+		body = "demo/0.1\n"
+	}
+	if strings.HasPrefix(req.Path, "/host") && host != "" {
+		body = "host: " + host + "\n"
+	}
+	if req.Path != "/" && !strings.HasPrefix(req.Path, "/version") && !strings.HasPrefix(req.Path, "/host") {
+		_ = writeResponse(conn, 404, "not found\n")
+		return
+	}
+
+	if req.Method == "HEAD" {
+		err = writeResponse(conn, 200, "")
+	} else {
+		err = writeResponse(conn, 200, body)
+	}
+	if err != nil && err != io.EOF {
+		log.Printf("write: %v", err)
+	}
+}
+```
+
+To turn this into a single file you already have `package main`, imports merged, `main` calling `handle`, and duplicate imports removed—`go fmt` will normalize the import block.
+
+## 7. Why you normally stop here and use `net/http`
+
+A production HTTP server must handle:
+
+- **Partial writes** and **backpressure** (short `Write`s, `Writev`, write timeouts).
+- **Slowloris**-style attacks (read deadlines, header limits, max idle time).
+- **`Content-Length` vs `Transfer-Encoding: chunked`**, 100-continue, trailers.
+- **Keep-alive**, pipelining, and correct ordering under concurrency on a single connection.
+- **TLS** (prefer letting a reverse proxy terminate TLS, or use `crypto/tls` with sane cipher suites and modern defaults).
+
+The standard library solves most of this; frameworks solve routing, middleware, and observability.
+
+## 8. Container image with Docker
+
+Multi-stage builds keep the runtime image small: compile with a full Go toolchain, copy only the static binary into a minimal base.
+
+**`Dockerfile`**
+
+```dockerfile
+# syntax=docker/dockerfile:1
+
+FROM golang:1.22-bookworm AS build
+WORKDIR /src
+COPY go.mod ./
+RUN go mod download || true
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/server ./cmd/server
+
+FROM gcr.io/distroless/static-debian12:nonroot
+WORKDIR /
+COPY --from=build /out/server /server
+USER nonroot:nonroot
+EXPOSE 8080
+ENTRYPOINT ["/server"]
+```
+
+Assume your program listens on `:8080` (or `PORT` from the environment—Kubernetes will set `containerPort` to match). A matching **`go.mod`** at the repo root is enough:
+
+```text
+module example.com/tcp-http-demo
+
+go 1.22
+```
+
+Organize the source as `cmd/server/main.go` holding the full `main` from earlier sections.
+
+Build and run locally:
+
+```bash
+docker build -t tcp-http-demo:latest .
+docker run --rm -p 8080:8080 tcp-http-demo:latest
+```
+
+Health checks against `/` (or add a cheap `GET /healthz` in your router) should return `200` quickly.
+
+## 9. Deploying on Kubernetes
+
+Below is a minimal **Deployment** and **Service**. It assumes the image is available to your cluster (push to a registry and replace the image name).
+
+**`deploy/deployment.yaml`**
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tcp-http-demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: tcp-http-demo
+  template:
+    metadata:
+      labels:
+        app: tcp-http-demo
+    spec:
+      containers:
+        - name: server
+          image: your-registry.example/tcp-http-demo:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "128Mi"
+            limits:
+              cpu: "2"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tcp-http-demo
+spec:
+  selector:
+    app: tcp-http-demo
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
+```
+
+**Production extras** you would add for real traffic:
+
+- **`PodDisruptionBudget`** so rollouts do not drain all replicas at once.
+- **Horizontal Pod Autoscaler** on CPU, memory, or custom metrics (e.g. in-cluster Prometheus requests per second).
+- **Ingress** (or a cloud load balancer) for TLS and HTTP/2 at the edge; most clusters never expose raw `ClusterIP` to the public internet.
+- **NetworkPolicies** if you need segmentation.
+
+Apply with:
+
+```bash
+kubectl apply -f deploy/deployment.yaml
+kubectl port-forward svc/tcp-http-demo 8080:80
+```
+
+## 10. “Millions of requests per second”—what that actually means
+
+**Throughput math.** 1,000,000 RPS with an average **end-to-end latency under ~1 ms** is already a massive aggregate bandwidth and CPU problem unless responses are tiny and work per request is trivial. In benchmarks, people often:
+
+- Use **keep-alive** and **pipelining** (where supported) so the cost of handshakes does not dominate.
+- Spread load across **many client machines** (or cloud worker VMs) so no single NIC or CPU is the bottleneck.
+- Tune the OS: file descriptors, `somaxconn`, `net.core.somaxconn`, `tcp_tw_reuse` (Linux specifics vary by kernel—always measure), IRQ affinity, and busy-polling where appropriate.
+- Use **SO_REUSEPORT** and multiple accept threads/processes (Go’s `net` can work with multiple listeners in advanced setups; common pattern is multiple processes behind a load balancer).
+
+**Tools** used in industry and open-source benchmarking:
+
+- **[Vegeta](https://github.com/tsenart/vegeta)** — steady-rate HTTP load with good reporting; easy to script.
+- **[wrk](https://github.com/wg/wrk) / [wrk2](https://github.com/giltene/wrk2)** — very efficient multithreaded client; wrk2 targets **constant throughput** with latency histograms.
+- **[k6](https://k6.io/)** — scriptable scenarios; **distributed execution** for very high aggregate RPS.
+- **Custom clients** in Go or C++ when you need to shave microseconds and control connection pools precisely.
+
+**Example: Vegeta at a fixed rate** (from a machine close to the cluster on the network):
+
+```bash
+echo "GET http://$INGRESS_IP/healthz" | vegeta attack -rate=50000 -duration=30s | vegeta report
+```
+
+That prints success rate, latencies, and throughput. To approach **millions of RPS** you typically:
+
+1. Run **dozens or hundreds of load generator instances** each pushing hundreds of thousands of RPS.
+2. Ensure the **ingress and service mesh** can forward that aggregate (often the first limit you hit).
+3. Scale **Kubernetes pods** horizontally until the **application, kernel, or datastore** becomes the bottleneck.
+
+It is honest engineering to report **per-tier** numbers: client aggregate RPS, edge RPS, and origin RPS—they are rarely identical once retries, caching, and downsampling enter the picture.
+
+## 11. What you learned
+
+- **`net.Listen` → `Accept` → `Read`/`Write`** is the skeleton of every TCP server.
+- **HTTP/1.1** is a text header block terminated by `\r\n\r\n`, followed by an optional body.
+- **Docker** packages the Go binary in a small runtime; **Kubernetes** schedules many replicas behind a **Service**.
+- **Extreme RPS** is a **systems** problem: OS tuning, network, connection reuse, horizontal scale on both clients and servers, and realistic measurement methodology—not a single magic flag.
+
+If you extend this demo, the next incremental steps are **read/write deadlines**, a **header size cap** with incremental parsing, **`HEAD` body suppression** (already partially there), and **`GET /metrics`** for Prometheus—still without pulling in all of `net/http`, if you want to keep the experiment pure.

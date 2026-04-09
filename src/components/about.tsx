@@ -1,23 +1,15 @@
 import Section from "./section";
-import { info, socials } from "@/lib/data/personal";
-import Link from "next/link";
+import { info } from "@/lib/data/personal";
+import { AnimatedTextLink } from "./ui/animated-text-link";
 
 export default function About() {
     return (
-        <Section title="About">
-            <div className="p-4 space-y-4">
-                <p className="text-sm text-muted-foreground">{info.description}</p>
+        <Section title="ABOUT">
+            <div className="pt-8 space-y-4">
+                <p className="leading-relaxed text-xs text-neutral-700 dark:text-neutral-300">{info.description}</p>
 
-                <div className="pt-2 text-sm text-muted-foreground">
-                    <p>
-                        Want to link up?{" "}
-                        <Link
-                            href={`mailto:${socials.email}`}
-                            className="font-medium text-primary hover:underline"
-                        >
-                            Get in touch at {socials.email}
-                        </Link>
-                    </p>
+                <div className="pt-2 text-xs">
+                    <AnimatedTextLink href="/about">More about me</AnimatedTextLink>
                 </div>
             </div>
         </Section>

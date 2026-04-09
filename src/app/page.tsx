@@ -2,21 +2,28 @@ import Info from "@/components/info";
 import About from "@/components/about";
 import Experience from "@/components/experience";
 import Projects from "@/components/projects";
+import Writings from "@/components/writings";
 import Photos from "@/components/photos";
 import { StaggerContainer } from "@/components/stagger-container";
+import Education from "@/components/education";
+import Skills from "@/components/skills";
 
 export default function Home() {
   return (
-    <StaggerContainer className="min-h-screen grid grid-cols-1 md:grid-cols-3 gap-8 pt-10 pb-20 max-w-4xl mx-auto">
+    <div className="min-h-screen px-4 lg:px-0 grid grid-cols-1 md:grid-cols-5 gap-20 pt-20 pb-20 max-w-4xl mx-auto">
 
-      <Info />
+      <StaggerContainer className="h-fit md:sticky md:top-6 md:col-span-2" delayStep={100}>
+        <Info />
+      </StaggerContainer>
 
-      <div className="flex flex-col gap-8 md:col-span-2">
+      <StaggerContainer className="flex flex-col gap-16 md:col-span-3" delayStep={100}>
         <About />
+        <Education />
         <Experience />
         <Projects />
-        <Photos />
-      </div>
-    </StaggerContainer>
+        <Skills />
+        <Writings />
+      </StaggerContainer>
+    </div>
   );
 }

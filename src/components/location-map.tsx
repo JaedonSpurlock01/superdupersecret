@@ -13,6 +13,7 @@ import { useTheme } from "./theme-provider";
 export function LocationMap() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
+  const compassDblClickCleanupRef = useRef<(() => void) | null>(null);
   const [timeString, setTimeString] = useState<string>("");
   const { currentTheme } = useTheme();
   const isDark = currentTheme === "dark";
@@ -51,6 +52,12 @@ export function LocationMap() {
       : "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
     const { lat, lng } = currentLocation.coordinates;
+    const initialView = {
+      center: [lng, lat] as [number, number],
+      zoom: 9,
+      bearing: 0,
+      pitch: 0,
+    };
 
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
@@ -67,10 +74,31 @@ export function LocationMap() {
       "top-right",
     );
 
+    const compassButton =
+      mapContainerRef.current.querySelector<HTMLButtonElement>(
+        ".maplibregl-ctrl-compass",
+      );
+
+    if (compassButton) {
+      const onCompassDoubleClick = (event: MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        map.easeTo({
+          ...initialView,
+          duration: 1000,
+          essential: true,
+        });
+      };
+
+      compassButton.addEventListener("dblclick", onCompassDoubleClick);
+      compassDblClickCleanupRef.current = () => {
+        compassButton.removeEventListener("dblclick", onCompassDoubleClick);
+      };
+    }
+
     map.on("load", () => {
       map.easeTo({
-        center: [lng, lat],
-        zoom: 9,
+        ...initialView,
         duration: 2500,
         essential: true,
       });
@@ -96,6 +124,8 @@ export function LocationMap() {
     });
 
     return () => {
+      compassDblClickCleanupRef.current?.();
+      compassDblClickCleanupRef.current = null;
       map.remove();
       mapRef.current = null;
     };
@@ -114,11 +144,14 @@ export function LocationMap() {
   return (
     <div className="relative h-full w-full">
       <div className="absolute inset-0 h-full w-full bg-background bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]" />
-      <div ref={mapContainerRef} className="relative h-full w-full" />
+      <div
+        ref={mapContainerRef}
+        className={`relative h-full w-full ${isDark ? "map-dark" : ""}`}
+      />
 
       {timeString && (
         <div className="pointer-events-none absolute left-3 top-3 z-10">
-          <Badge className="pointer-events-auto bg-background/80 text-xs text-foreground shadow-sm ring-1 ring-border/60 backdrop-blur">
+          <Badge variant="secondary" className="pointer-events-auto text-xs text-foreground shadow-sm ring-1 ring-border/60 backdrop-blur border border-border/40 rounded-sm">
             Local time · {timeString}
           </Badge>
         </div>

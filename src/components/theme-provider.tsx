@@ -1,6 +1,13 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
 
 export type Theme = "light" | "dark";
 
@@ -26,9 +33,11 @@ function getInitialTheme(): Theme {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  // Fixed initial value so server and first client render match (avoids hydration mismatch).
+  // The inline script in layout sets <html class="dark"> before paint; useEffect syncs React state.
   const [currentTheme, setCurrentTheme] = useState<Theme>("light");
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const theme = getInitialTheme();
     setCurrentTheme(theme);
     applyTheme(theme);
