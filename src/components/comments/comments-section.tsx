@@ -1,10 +1,23 @@
 "use client";
 
+import {
+  Delete02Icon,
+  MoreHorizontalIcon,
+  PencilEdit01Icon,
+  PencilIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import { signIn, useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
 import Section from "@/components/section";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type {
   CommentReplyJson,
   CommentsListJson,
@@ -55,6 +68,42 @@ function formatPostedAt(iso: string) {
     dateStyle: "medium",
     timeStyle: "short",
   });
+}
+
+function CommentActionsMenu({
+  onEdit,
+  onDelete,
+}: {
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        className={cn(
+          buttonVariants({ variant: "ghost", size: "icon-xs" }),
+          "-my-0.5 text-muted-foreground hover:text-foreground",
+        )}
+        aria-label="Comment actions"
+      >
+        <HugeiconsIcon
+          icon={MoreHorizontalIcon}
+          strokeWidth={2}
+          className="size-4"
+        />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-32">
+        <DropdownMenuItem onClick={onEdit}>
+          <HugeiconsIcon icon={PencilEdit01Icon} strokeWidth={2} />
+          Edit
+        </DropdownMenuItem>
+        <DropdownMenuItem variant="destructive" onClick={onDelete}>
+          <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }
 
 function MarkdownComposer({
@@ -248,11 +297,10 @@ function ReplyThread({
 
           return (
             <div key={r.id} className="relative flex gap-3">
-              <div className="relative z-10 flex w-6 shrink-0 justify-center pt-0.5">
+              <div className="relative z-10 flex size-6 shrink-0 justify-center pt-0.5">
                 <UserAvatar
                   src={r.author.image}
                   name={r.author.name}
-                  size={22}
                 />
               </div>
               <div className="min-w-0 flex-1 pb-1">
@@ -293,22 +341,10 @@ function ReplyThread({
                     onToggle={() => onLike(r.id)}
                   />
                   {authenticated && canModify(r.author.id) && !editingReply && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => onStartEditReply(r)}
-                        className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onDeleteReply(r.id)}
-                        className="text-xs font-medium text-destructive hover:underline"
-                      >
-                        Delete
-                      </button>
-                    </>
+                    <CommentActionsMenu
+                      onEdit={() => onStartEditReply(r)}
+                      onDelete={() => onDeleteReply(r.id)}
+                    />
                   )}
                 </div>
               </div>
@@ -632,28 +668,16 @@ export function CommentsSection({ slug }: { slug: string }) {
                             {replyOpen[c.id] ? "Cancel" : "Reply"}
                           </button>
                           {canModify(c.author.id) && (
-                            <>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setEdit({
-                                    scope: "top",
-                                    commentId: c.id,
-                                    draft: c.body,
-                                  })
-                                }
-                                className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
-                              >
-                                Edit
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => deleteComment(c.id, true)}
-                                className="text-xs font-medium text-destructive hover:underline"
-                              >
-                                Delete
-                              </button>
-                            </>
+                            <CommentActionsMenu
+                              onEdit={() =>
+                                setEdit({
+                                  scope: "top",
+                                  commentId: c.id,
+                                  draft: c.body,
+                                })
+                              }
+                              onDelete={() => deleteComment(c.id, true)}
+                            />
                           )}
                         </>
                       )}
