@@ -54,12 +54,23 @@ export function BooksClient({ books }: { books: Book[] }) {
                 type="button"
                 role="tab"
                 aria-selected={isActive}
-                variant={isActive ? "secondary" : "outline"}
+                variant="ghost"
                 size="sm"
                 className={cn(
-                  "w-fit justify-start rounded-sm text-[11px] font-medium",
-                  !isActive &&
-                  "border-border/80 bg-transparent text-muted-foreground hover:text-foreground",
+                  "w-fit justify-start h-auto min-h-0 rounded-sm border px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide shadow-none",
+                  isActive
+                    ? [
+                        // Light: selected state stays clearly distinct from badge-style inactive
+                        "border-neutral-500/60 bg-neutral-300 text-neutral-950 hover:bg-neutral-300/80",
+                        // Dark: unchanged from previous secondary Button
+                        "dark:border-transparent dark:bg-secondary dark:text-secondary-foreground dark:hover:bg-secondary/80",
+                      ]
+                    : [
+                        // Light: match Skills badges + book status pills on home (neutral-200 / border-border/40)
+                        "border-border/40 bg-neutral-200 text-neutral-700 hover:bg-neutral-300/80 hover:text-neutral-900",
+                        // Dark: unchanged from previous outline + custom inactive classes
+                        "dark:border-border/80 dark:bg-transparent dark:text-muted-foreground dark:hover:!bg-transparent dark:hover:text-foreground",
+                      ],
                 )}
                 onClick={() => setFilter(key)}
               >
