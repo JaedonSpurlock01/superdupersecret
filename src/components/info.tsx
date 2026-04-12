@@ -73,7 +73,7 @@ export default function Info() {
                     alt="Profile"
                     width={120}
                     height={120}
-                    className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 rounded-full border-4 border-background"
+                    className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 rounded-full border-4 border-neutral-100 dark:border-neutral-900"
                 />
             </div>
 
@@ -83,6 +83,9 @@ export default function Info() {
                 <p className="text-sm text-muted-foreground">
                     {info.location}
                 </p>
+                <a href={`mailto:${socials.email}`}>
+                    <p className="text-xs text-muted-foreground underline hover:text-blue-500">Contact me</p>
+                </a>
             </div>
 
             <div className="flex items-center justify-center pb-4">
@@ -120,7 +123,7 @@ export default function Info() {
                         }
                     />
 
-                    <InfoActionButton
+                    {/* <InfoActionButton
                         tooltip="Email"
                         ariaLabel="Send email"
                         href={`mailto:${socials.email}`}
@@ -129,7 +132,7 @@ export default function Info() {
                                 <path d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v.35l-9 5.4-9-5.4V6zm0 2.67V18a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.67l-8.48 5.09a1 1 0 0 1-1.04 0L3 8.67z" />
                             </svg>
                         }
-                    />
+                    /> */}
 
                     <InfoActionButton
                         tooltip="Guestbook"

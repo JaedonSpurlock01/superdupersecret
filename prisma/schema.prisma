@@ -38,3 +38,20 @@ model CommentLike {
 
   @@unique([commentId, userId])
 }
+
+model BlogPostView {
+  postSlug  String @id
+  viewCount Int    @default(0)
+}
+
+model GuestbookEntry {
+  id        String   @id @default(cuid())
+  deviceId  String   @unique
+  dotId     String
+  name      String
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([dotId])
+}

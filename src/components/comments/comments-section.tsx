@@ -549,7 +549,11 @@ export function CommentsSection({ slug }: { slug: string }) {
   };
 
   return (
-    <Section title="Comments" className="mt-16">
+    <Section
+      id="comments"
+      title="Comments"
+      className="mt-16 scroll-mt-24"
+    >
       <div className="mt-6 rounded-sm dark:bg-card/20">
         {status === "unauthenticated" && (
           <div className="mb-6 rounded-sm border border-border bg-muted/30 p-4 text-sm text-muted-foreground">

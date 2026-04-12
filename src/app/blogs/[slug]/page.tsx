@@ -9,7 +9,9 @@ import { useMDXComponents } from "@/../mdx-components";
 import { CommentsSection } from "@/components/comments";
 import { StaggerContainer } from "@/components/stagger-container";
 import { Badge } from "@/components/ui/badge";
+import { BlogPostEngagement } from "@/components/blog-post-engagement";
 import { getAllBlogs, getBlogBySlug } from "@/lib/blog";
+import { getBlogPostStats } from "@/lib/blog-stats";
 import { rehypePrettyCodeOptions } from "@/lib/mdx/rehype-pretty-code-options";
 import { BlogPostBack } from "./blog-post-back";
 
@@ -39,6 +41,8 @@ export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params;
   const post = await getBlogBySlug(slug);
   if (!post) notFound();
+
+  const stats = await getBlogPostStats(slug);
 
   const { content } = await compileMDX({
     source: post.content,
@@ -110,6 +114,11 @@ export default async function BlogPostPage({ params }: PageProps) {
                     </dd>
                   </div>
                 )}
+                <BlogPostEngagement
+                  slug={slug}
+                  initialCommentCount={stats.commentCount}
+                  initialViewCount={stats.viewCount}
+                />
               </dl>
             </div>
           </aside>

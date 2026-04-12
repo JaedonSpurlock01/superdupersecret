@@ -3,7 +3,7 @@ import About from "@/components/about";
 import Experience from "@/components/experience";
 import Projects from "@/components/projects";
 import Writings from "@/components/writings";
-import Photos from "@/components/photos";
+import Books from "@/components/books";
 import { StaggerContainer } from "@/components/stagger-container";
 import Education from "@/components/education";
 import Skills from "@/components/skills";
@@ -23,6 +23,7 @@ export default function Home() {
         <Projects />
         <Skills />
         <Writings />
+        <Books />
       </StaggerContainer>
     </div>
   );

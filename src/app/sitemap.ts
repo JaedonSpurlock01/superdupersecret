@@ -7,7 +7,7 @@ const siteUrl =
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getAllBlogs();
 
-  const staticRoutes = ["", "/about", "/blogs", "/guestbook"].map((route) => ({
+  const staticRoutes = ["", "/about", "/blogs", "/books", "/guestbook"].map((route) => ({
     url: `${siteUrl}${route}`,
     lastModified: new Date().toISOString(),
   }));

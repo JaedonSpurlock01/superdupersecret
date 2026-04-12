@@ -1,0 +1,60 @@
+[
+  {
+    "id": "design-everyday-things",
+    "title": "The Design of Everyday Things",
+    "author": "Don Norman",
+    "image": "https://covers.openlibrary.org/b/id/9255560-L.jpg",
+    "status": "finished",
+    "summary": "How good design matches human psychology—and what happens when it does not.",
+    "addedAt": "2024-01-15T12:00:00.000Z",
+    "updatedAt": "2024-03-20T12:00:00.000Z"
+  },
+  {
+    "id": "atomic-habits",
+    "title": "Atomic Habits",
+    "author": "James Clear",
+    "image": "https://covers.openlibrary.org/b/id/8380861-L.jpg",
+    "status": "reading",
+    "summary": "Small habits, compound growth, identity-based behavior change.",
+    "addedAt": "2025-11-01T12:00:00.000Z",
+    "updatedAt": "2026-04-08T12:00:00.000Z"
+  },
+  {
+    "id": "structure-interpretation",
+    "title": "Structure and Interpretation of Computer Programs",
+    "author": "Abelson, Sussman & Sussman",
+    "image": "https://covers.openlibrary.org/b/id/8387020-L.jpg",
+    "status": "want_to_read",
+    "summary": "The classic intro to programming as building and reasoning about processes.",
+    "addedAt": "2026-03-10T12:00:00.000Z"
+  },
+  {
+    "id": "thinking-fast-slow",
+    "title": "Thinking, Fast and Slow",
+    "author": "Daniel Kahneman",
+    "image": "https://covers.openlibrary.org/b/id/7449340-L.jpg",
+    "status": "finished",
+    "summary": "Heuristics, biases, and how we actually make decisions.",
+    "addedAt": "2023-06-01T12:00:00.000Z",
+    "updatedAt": "2023-09-12T12:00:00.000Z"
+  },
+  {
+    "id": "staff-engineer",
+    "title": "Staff Engineer",
+    "author": "Will Larson",
+    "image": "https://covers.openlibrary.org/b/id/10723217-L.jpg",
+    "status": "want_to_read",
+    "summary": "Leadership beyond the manager track—technical strategy and influence.",
+    "addedAt": "2026-02-18T12:00:00.000Z"
+  },
+  {
+    "id": "deep-work",
+    "title": "Deep Work",
+    "author": "Cal Newport",
+    "image": "https://covers.openlibrary.org/b/id/8136921-L.jpg",
+    "status": "finished",
+    "summary": "Rules for focused success in a distracted world.",
+    "addedAt": "2022-11-20T12:00:00.000Z",
+    "updatedAt": "2023-01-05T12:00:00.000Z"
+  }
+]

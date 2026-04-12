@@ -16,13 +16,25 @@ const photoLinks = [
 
 export default function AboutPage() {
     return (
-        <div className="min-h-screen px-4 lg:px-0 grid grid-cols-1 md:grid-cols-5 gap-20 pt-20 pb-20 max-w-4xl mx-auto">
+        <div className="min-h-screen px-4 lg:px-0 grid grid-cols-1 md:grid-cols-5 gap-4 pt-20 pb-20 max-w-3xl mx-auto">
 
             <StaggerContainer className="h-fit md:sticky md:top-6 md:col-span-2" delayStep={100}>
                 <AnimatedTextLink href="/" arrowSide="left">About Me</AnimatedTextLink>
 
-                <p className="leading-relaxed text-xs text-neutral-700 dark:text-neutral-300">
+                <p className="leading-relaxed text-xs text-neutral-700 dark:text-neutral-300 my-4">
+                    {info.description}
+                </p>
 
+                <p className="leading-relaxed text-xs text-neutral-700 dark:text-neutral-300 my-4">
+                    {info.description}
+                </p>
+
+                <p className="leading-relaxed text-xs text-neutral-700 dark:text-neutral-300 my-4">
+                    {info.description}
+                </p>
+
+                <p className="leading-relaxed text-xs text-neutral-700 dark:text-neutral-300 my-4">
+                    {info.description}
                 </p>
 
                 <div className="flex items-center gap-1.5">
