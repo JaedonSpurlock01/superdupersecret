@@ -111,7 +111,7 @@ export async function GET(
   const oldestInBatch = batch[batch.length - 1];
   const hasMore =
     oldestInBatch !== undefined &&
-    (await prisma.comment.count({
+    (await prisma.comment.findFirst({
       where: {
         parentId: threadId,
         OR: [
@@ -124,7 +124,8 @@ export async function GET(
           },
         ],
       },
-    })) > 0;
+      select: { id: true },
+    })) != null;
 
   const nextCursor =
     hasMore && oldestInBatch

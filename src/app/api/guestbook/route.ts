@@ -9,6 +9,8 @@ const NAME_MAX = 80;
 const MESSAGE_MAX = 8_000;
 const DEVICE_ID_MIN = 8;
 const DEVICE_ID_MAX = 128;
+/** Cap list size to bound read cost and payload size (adjust if you need more). */
+const LIST_MAX = 2000;
 
 function toJson(row: {
   id: string;
@@ -36,21 +38,24 @@ export async function GET(req: Request) {
   const deviceId = searchParams.get("deviceId")?.trim() ?? "";
 
   try {
-    const entries = await prisma.guestbookEntry.findMany({
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        dotId: true,
-        name: true,
-        message: true,
-        createdAt: true,
-      },
-    });
+    const minePromise =
+      deviceId && isValidDeviceId(deviceId)
+        ? prisma.guestbookEntry.findUnique({
+            where: { deviceId },
+            select: {
+              id: true,
+              dotId: true,
+              name: true,
+              message: true,
+              createdAt: true,
+            },
+          })
+        : Promise.resolve(null);
 
-    let mine: GuestbookEntryJson | null = null;
-    if (deviceId && isValidDeviceId(deviceId)) {
-      const row = await prisma.guestbookEntry.findUnique({
-        where: { deviceId },
+    const [rows, mineRow] = await Promise.all([
+      prisma.guestbookEntry.findMany({
+        orderBy: { createdAt: "desc" },
+        take: LIST_MAX,
         select: {
           id: true,
           dotId: true,
@@ -58,12 +63,14 @@ export async function GET(req: Request) {
           message: true,
           createdAt: true,
         },
-      });
-      mine = row ? toJson(row) : null;
-    }
+      }),
+      minePromise,
+    ]);
+
+    const mine: GuestbookEntryJson | null = mineRow ? toJson(mineRow) : null;
 
     const body: GuestbookListJson = {
-      entries: entries.map(toJson),
+      entries: rows.map(toJson),
       mine,
     };
     return NextResponse.json(body);

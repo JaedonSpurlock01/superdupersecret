@@ -28,6 +28,8 @@ model Comment {
 
   @@index([postSlug])
   @@index([parentId])
+  /// Speeds up top-level threads: WHERE postSlug = ? AND parentId IS NULL
+  @@index([postSlug, parentId])
 }
 
 model CommentLike {
@@ -54,4 +56,5 @@ model GuestbookEntry {
   updatedAt DateTime @updatedAt
 
   @@index([dotId])
+  @@index([createdAt(sort: Desc)])
 }

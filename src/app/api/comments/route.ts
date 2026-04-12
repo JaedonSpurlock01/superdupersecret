@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@/generated/prisma/client";
+import type { Comment } from "@/generated/prisma/client";
 import { auth } from "@/auth";
 import type { CommentsListJson } from "@/lib/comments/api-types";
 import {
@@ -35,9 +37,20 @@ export async function GET(req: Request) {
       return NextResponse.json(body);
     }
 
-    const allReplies = await prisma.comment.findMany({
-      where: { parentId: { in: topIds } },
-    });
+    // Only fetch the latest REPLY_PAGE rows per thread (avoids loading every reply when threads are huge).
+    const allReplies = await prisma.$queryRaw<Comment[]>`
+      SELECT "id", "postSlug", "body", "createdAt", "pinned", "parentId", "authorId", "authorName", "authorImage"
+      FROM (
+        SELECT *,
+          ROW_NUMBER() OVER (
+            PARTITION BY "parentId"
+            ORDER BY "createdAt" DESC, "id" DESC
+          ) AS "_reply_rn"
+        FROM "Comment"
+        WHERE "parentId" IN (${Prisma.join(topIds)})
+      ) AS "_sub"
+      WHERE "_reply_rn" <= ${REPLY_PAGE}
+    `;
 
     const byParent = new Map<string, typeof allReplies>();
     for (const r of allReplies) {
