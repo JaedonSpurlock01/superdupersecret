@@ -25,17 +25,6 @@ export default function AboutPage() {
                     {info.description}
                 </p>
 
-                <p className="leading-relaxed text-xs text-neutral-700 dark:text-neutral-300 my-4">
-                    {info.description}
-                </p>
-
-                <p className="leading-relaxed text-xs text-neutral-700 dark:text-neutral-300 my-4">
-                    {info.description}
-                </p>
-
-                <p className="leading-relaxed text-xs text-neutral-700 dark:text-neutral-300 my-4">
-                    {info.description}
-                </p>
 
                 <div className="flex items-center gap-1.5">
                     <InfoActionButton

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "siddhartha",
+    "title": "Siddhartha",
+    "author": "Hermann Hesse",
+    "image": "https://m.media-amazon.com/images/I/51z1viiNrFL._AC_UF1000,1000_QL80_.jpg",
+    "status": "finished",
+    "summary": "",
+    "addedAt": "2025-10-15T12:00:00.000Z",
+    "updatedAt": "2024-10-15T12:00:00.000Z"
+  },
+  {
+    "id": "stranger",
+    "title": "The Stranger",
+    "author": "Albert Camus",
+    "image": "https://m.media-amazon.com/images/I/61qtGqfgUjL._AC_UF1000,1000_QL80_.jpg",
+    "status": "finished",
+    "summary": "",
+    "addedAt": "2025-10-15T12:00:00.000Z",
+    "updatedAt": "2024-10-15T12:00:00.000Z"
+  },
+  {
+    "id": "myth-of-sisyphus",
+    "title": "The Myth of Sisyphus",
+    "author": "Albert Camus",
+    "image": "https://m.media-amazon.com/images/I/61-M36Jrb0L._AC_UF1000,1000_QL80_.jpg",
+    "status": "want_to_read",
+    "summary": "",
+    "addedAt": "2025-10-15T12:00:00.000Z",
+    "updatedAt": "2024-10-15T12:00:00.000Z"
+  },
+  {
+    "id": "count-of-monte-cristo",
+    "title": "The Count of Monte Cristo",
+    "author": "Alexandre Dumas",
+    "image": "https://m.media-amazon.com/images/I/811iBn28JdL._AC_UF1000,1000_QL80_.jpg",
+    "status": "want_to_read",
+    "summary": "",
+    "addedAt": "2026-04-12T12:00:00.000Z",
+    "updatedAt": "2026-04-12T12:00:00.000Z"
+  },
+  {
+    "id": "republic",
+    "title": "The Republic",
+    "author": "Plato",
+    "image": "https://m.media-amazon.com/images/I/91nYfNvYa7L._AC_UF1000,1000_QL80_.jpg",
+    "status": "reading",
+    "summary": "",
+    "addedAt": "2026-04-12T12:00:00.000Z",
+    "updatedAt": "2026-04-12T12:00:00.000Z"
+  }
+]
