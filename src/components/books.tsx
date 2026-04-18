@@ -1,7 +1,7 @@
 import Image from "next/image";
-import Section from "./section";
-import { getRecentBooks } from "@/lib/books";
 import { BOOK_STATUS_LABEL, bookActivityTime } from "@/lib/book-utils";
+import { getRecentBooks } from "@/lib/books";
+import Section from "./section";
 import { AnimatedTextLink } from "./ui/animated-text-link";
 
 export default function Books() {
@@ -28,7 +28,9 @@ export default function Books() {
                     <h2 className="line-clamp-1 text-sm font-semibold leading-tight tracking-tight underline decoration-transparent underline-offset-2 transition-colors duration-300 group-hover:decoration-foreground">
                       {book.title}
                     </h2>
-                    <p className="mt-0.5 text-xs text-muted-foreground">{book.author}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {book.author}
+                    </p>
                     {book.summary && (
                       <p className="mt-1 line-clamp-2 text-xs text-muted-foreground leading-relaxed">
                         {book.summary}
@@ -40,12 +42,17 @@ export default function Books() {
                   <span className="rounded-sm border border-border/60 bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-400">
                     {BOOK_STATUS_LABEL[book.status]}
                   </span>
-                  <time dateTime={new Date(bookActivityTime(book)).toISOString()}>
-                    {new Date(bookActivityTime(book)).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
+                  <time
+                    dateTime={new Date(bookActivityTime(book)).toISOString()}
+                  >
+                    {new Date(bookActivityTime(book)).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      },
+                    )}
                   </time>
                 </div>
               </div>

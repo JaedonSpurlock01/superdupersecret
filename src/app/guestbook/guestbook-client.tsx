@@ -6,8 +6,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { GuestbookComposer } from "@/components/guestbook-composer";
 import { GuestbookMap } from "@/components/guestbook-map";
 import { StaggerContainer } from "@/components/stagger-container";
-import { Button } from "@/components/ui/button";
 import { AnimatedTextLink } from "@/components/ui/animated-text-link";
+import { Button } from "@/components/ui/button";
 import type {
   GuestbookEntryJson,
   GuestbookListJson,
@@ -98,28 +98,26 @@ function EntryCard({
         >
           {inner}
         </button>
-        <div
-          className="flex shrink-0 items-stretch border-l border-border/50"
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-auto min-h-9 w-10 shrink-0 rounded-none border-l border-border/50 text-muted-foreground hover:bg-transparent hover:text-destructive"
+          disabled={deleting}
+          aria-label="Delete your entry"
           onPointerDown={(e) => e.stopPropagation()}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            onDelete();
+          }}
         >
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-auto min-h-9 w-10 shrink-0 rounded-none text-muted-foreground hover:bg-transparent hover:text-destructive"
-            disabled={deleting}
-            aria-label="Delete your entry"
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              onDelete();
-            }}
-          >
-            <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} className="size-4" />
-          </Button>
-        </div>
+          <HugeiconsIcon
+            icon={Delete02Icon}
+            strokeWidth={2}
+            className="size-4"
+          />
+        </Button>
       </div>
     );
   }
@@ -317,7 +315,10 @@ export default function GuestbookPage() {
           message,
         }),
       });
-      const raw = (await res.json()) as { error?: string; entry?: GuestbookEntryJson };
+      const raw = (await res.json()) as {
+        error?: string;
+        entry?: GuestbookEntryJson;
+      };
       if (!res.ok) {
         setEntriesError(raw.error ?? "Could not save entry.");
         return;
@@ -361,10 +362,7 @@ export default function GuestbookPage() {
 
   return (
     <main className="mx-auto grid min-h-screen max-w-4xl grid-cols-1 gap-y-10 px-4 pt-20 pb-20 md:grid-cols-6 lg:px-0">
-      <StaggerContainer
-        className="order-1 md:hidden"
-        delayStep={100}
-      >
+      <StaggerContainer className="order-1 md:hidden" delayStep={100}>
         <GuestbookPageIntro />
       </StaggerContainer>
 
@@ -408,6 +406,7 @@ export default function GuestbookPage() {
           </h2>
           <div className="mt-4 flex items-start gap-3 rounded-md border border-border p-4">
             <div
+              role="img"
               className="relative mt-0.5 grid h-2.5 w-2.5 shrink-0 place-items-center"
               aria-label={`Visitors online: ${onlineCount ?? "—"}`}
               title={`Visitors online: ${onlineCount ?? "—"}`}
@@ -488,19 +487,21 @@ export default function GuestbookPage() {
       </StaggerContainer>
 
       {isEntryOpen && (
-        <div
-          className={`fixed inset-0 z-60 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-200 ${
-            isEntryVisible ? "opacity-100" : "opacity-0"
-          }`}
-          onClick={() => setIsEntryOpen(false)}
-        >
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
+          <button
+            type="button"
+            className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-200 ${
+              isEntryVisible ? "opacity-100" : "opacity-0"
+            }`}
+            aria-label="Close guestbook entry dialog"
+            onClick={() => setIsEntryOpen(false)}
+          />
           <div
-            className={`mx-4 w-full max-w-md overflow-hidden rounded-md border border-border bg-background p-5 shadow-lg transform-gpu transition-all duration-200 ease-out ${
+            className={`relative z-10 mx-4 w-full max-w-md overflow-hidden rounded-md border border-border bg-background p-5 shadow-lg transform-gpu transition-all duration-200 ease-out ${
               isEntryVisible
                 ? "opacity-100 scale-100 translate-y-0"
                 : "opacity-0 scale-95 translate-y-1"
             }`}
-            onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-5 flex items-start justify-between gap-3">
               <div className="space-y-1">

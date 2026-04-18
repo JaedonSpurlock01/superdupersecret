@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, type ReactNode, useContext } from "react";
 
 type DatabaseFeaturesValue = {
   /** Postgres is configured and responding (cached server-side). */

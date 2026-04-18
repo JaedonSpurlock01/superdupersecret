@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { isValidGuestbookDotId } from "@/lib/guestbook/dots";
-import type { GuestbookEntryJson, GuestbookListJson } from "@/lib/guestbook/types";
+import type {
+  GuestbookEntryJson,
+  GuestbookListJson,
+} from "@/lib/guestbook/types";
 import { getPrismaClient } from "@/lib/prisma";
 
 export const runtime = "nodejs";
@@ -109,8 +112,7 @@ export async function POST(req: Request) {
   }
 
   const o = body as Record<string, unknown>;
-  const deviceId =
-    typeof o.deviceId === "string" ? o.deviceId.trim() : "";
+  const deviceId = typeof o.deviceId === "string" ? o.deviceId.trim() : "";
   const dotId = typeof o.dotId === "string" ? o.dotId.trim() : "";
   const name = typeof o.name === "string" ? o.name.trim() : "";
   const message = typeof o.message === "string" ? o.message.trim() : "";
@@ -120,7 +122,10 @@ export async function POST(req: Request) {
   }
 
   if (!isValidGuestbookDotId(dotId)) {
-    return NextResponse.json({ error: "Invalid map location" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid map location" },
+      { status: 400 },
+    );
   }
 
   if (name.length < 1 || name.length > NAME_MAX) {

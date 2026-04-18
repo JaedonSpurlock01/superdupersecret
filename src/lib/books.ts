@@ -1,6 +1,6 @@
+import booksJson from "@/lib/data/books.json";
 import type { Book } from "./book-utils";
 import { bookActivityTime } from "./book-utils";
-import booksJson from "@/lib/data/books.json";
 
 export type { Book, BookStatus } from "./book-utils";
 export { BOOK_STATUS_LABEL, bookActivityTime } from "./book-utils";

@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
+import maplibregl, { type Map as MapLibreMap } from "maplibre-gl";
 import { useEffect, useRef, useState } from "react";
-import maplibregl, { Map as MapLibreMap } from "maplibre-gl";
 import { currentLocation } from "@/lib/data/location";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { Badge } from "@/components/ui/badge";
-
-import positron from "@/lib/data/positron.json";
-import darkMatter from "@/lib/data/dark-matter.json";
 import { useTheme } from "./theme-provider";
+
+const DEFAULT_MAP_STYLE =
+  "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
 export function LocationMap() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -47,10 +47,6 @@ export function LocationMap() {
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
-    const style = isDark
-      ? "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
-      : "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
-
     const { lat, lng } = currentLocation.coordinates;
     const initialView = {
       center: [lng, lat] as [number, number],
@@ -61,7 +57,7 @@ export function LocationMap() {
 
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
-      style,
+      style: DEFAULT_MAP_STYLE,
       center: [lng, lat],
       zoom: 1.5,
       attributionControl: false,
@@ -104,8 +100,7 @@ export function LocationMap() {
       });
 
       const markerEl = document.createElement("div");
-      markerEl.className =
-        "relative h-6 w-6 -translate-x-1/2 -translate-y-1/2";
+      markerEl.className = "relative h-6 w-6 -translate-x-1/2 -translate-y-1/2";
 
       const inner = document.createElement("div");
       inner.className =
@@ -139,7 +134,7 @@ export function LocationMap() {
       : "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
     mapRef.current.setStyle(style);
-  }, [currentTheme])
+  }, [isDark]);
 
   return (
     <div className="relative h-full w-full">
@@ -151,7 +146,10 @@ export function LocationMap() {
 
       {timeString && (
         <div className="pointer-events-none absolute left-3 top-3 z-10">
-          <Badge variant="secondary" className="pointer-events-auto text-xs text-foreground shadow-sm ring-1 ring-border/60 backdrop-blur border border-border/40 rounded-sm">
+          <Badge
+            variant="secondary"
+            className="pointer-events-auto text-xs text-foreground shadow-sm ring-1 ring-border/60 backdrop-blur border border-border/40 rounded-sm"
+          >
             Local time · {timeString}
           </Badge>
         </div>
@@ -159,4 +157,3 @@ export function LocationMap() {
     </div>
   );
 }
-

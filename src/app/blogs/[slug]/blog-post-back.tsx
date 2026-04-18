@@ -27,11 +27,7 @@ export function BlogPostBack({
   const goBack = () => {
     try {
       const stored = sessionStorage.getItem(APP_PREVIOUS_PATH_KEY);
-      if (
-        stored &&
-        isSafeInternalPath(stored) &&
-        stored !== pathname
-      ) {
+      if (stored && isSafeInternalPath(stored) && stored !== pathname) {
         router.push(stored);
         return;
       }

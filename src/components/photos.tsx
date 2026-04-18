@@ -76,19 +76,18 @@ const randomInRange = (min: number, max: number) =>
   Math.random() * (max - min) + min;
 
 export default function Photos() {
-  const [positions, setPositions] = useState<Record<number, { x: number; y: number }>>(
-    () =>
-      PHOTOS.reduce(
-        (acc, photo, index) => ({
-          ...acc,
-          [photo.id]: {
-            x: randomInRange(-180, 180),
-            y: randomInRange(-120, 120),
-          },
-        }),
-        {} as Record<number, { x: number; y: number }>,
-      ),
-  );
+  const [positions, setPositions] = useState<
+    Record<number, { x: number; y: number }>
+  >(() => {
+    const acc: Record<number, { x: number; y: number }> = {};
+    for (const photo of PHOTOS) {
+      acc[photo.id] = {
+        x: randomInRange(-180, 180),
+        y: randomInRange(-120, 120),
+      };
+    }
+    return acc;
+  });
 
   const dragRef = useRef<DragState | null>(null);
   const momentumRef = useRef<number | null>(null);
@@ -99,7 +98,7 @@ export default function Photos() {
   const [isMounted, setIsMounted] = useState(false);
 
   const handlePointerDown = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>, id: number) => {
+    (event: React.PointerEvent<HTMLElement>, id: number) => {
       if (momentumRef.current !== null) {
         cancelAnimationFrame(momentumRef.current);
         momentumRef.current = null;
@@ -128,39 +127,43 @@ export default function Photos() {
     [positions],
   );
 
-  const handlePointerMove = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current || event.buttons === 0) return;
+  const handlePointerMove = useCallback(
+    (event: React.PointerEvent<HTMLElement>) => {
+      if (!dragRef.current || event.buttons === 0) return;
 
-    event.preventDefault();
+      event.preventDefault();
 
-    const { id, startX, startY, originX, originY, lastX, lastY, lastTime } = dragRef.current;
-    const deltaX = event.clientX - startX;
-    const deltaY = event.clientY - startY;
+      const { id, startX, startY, originX, originY, lastX, lastY, lastTime } =
+        dragRef.current;
+      const deltaX = event.clientX - startX;
+      const deltaY = event.clientY - startY;
 
-    const now = performance.now();
-    const dt = Math.max(now - lastTime, 16);
-    const frameDx = event.clientX - lastX;
-    const frameDy = event.clientY - lastY;
-    const velocityX = frameDx / dt;
-    const velocityY = frameDy / dt;
+      const now = performance.now();
+      const dt = Math.max(now - lastTime, 16);
+      const frameDx = event.clientX - lastX;
+      const frameDy = event.clientY - lastY;
+      const velocityX = frameDx / dt;
+      const velocityY = frameDy / dt;
 
-    dragRef.current = {
-      ...dragRef.current,
-      lastX: event.clientX,
-      lastY: event.clientY,
-      lastTime: now,
-      velocityX,
-      velocityY,
-    };
+      dragRef.current = {
+        ...dragRef.current,
+        lastX: event.clientX,
+        lastY: event.clientY,
+        lastTime: now,
+        velocityX,
+        velocityY,
+      };
 
-    setPositions((prev) => ({
-      ...prev,
-      [id]: {
-        x: originX + deltaX,
-        y: originY + deltaY,
-      },
-    }));
-  }, []);
+      setPositions((prev) => ({
+        ...prev,
+        [id]: {
+          x: originX + deltaX,
+          y: originY + deltaY,
+        },
+      }));
+    },
+    [],
+  );
 
   const handlePointerUp = useCallback(() => {
     if (!dragRef.current) {
@@ -213,25 +216,21 @@ export default function Photos() {
     };
 
     momentumRef.current = requestAnimationFrame(animate);
-  }, [positions, setPositions]);
+  }, [positions]);
 
   const handleScatter = () => {
     setIsScattering(true);
     window.setTimeout(() => {
       setIsScattering(false);
     }, 450);
-    setPositions(
-      PHOTOS.reduce(
-        (acc, photo) => ({
-          ...acc,
-          [photo.id]: {
-            x: randomInRange(-300, 300),
-            y: randomInRange(-120, 120),
-          },
-        }),
-        {} as Record<number, { x: number; y: number }>,
-      ),
-    );
+    const next: Record<number, { x: number; y: number }> = {};
+    for (const photo of PHOTOS) {
+      next[photo.id] = {
+        x: randomInRange(-300, 300),
+        y: randomInRange(-120, 120),
+      };
+    }
+    setPositions(next);
     dragRef.current = null;
   };
 
@@ -289,9 +288,11 @@ export default function Photos() {
             const isDraggingThis = dragRef.current?.id === photo.id;
 
             return (
-              <div
+              <button
                 key={photo.id}
-                className="absolute left-1/2 top-1/2 w-40 sm:w-44 md:w-48 cursor-grab active:cursor-grabbing select-none"
+                type="button"
+                aria-label={`${photo.title}: draggable photo. Double-click or press Enter to enlarge.`}
+                className="absolute left-1/2 top-1/2 w-40 sm:w-44 md:w-48 cursor-grab active:cursor-grabbing select-none border-0 bg-transparent p-0 text-left font-inherit shadow-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 style={{
                   transform: `translate(-50%, -50%) translate(${pos.x}px, ${pos.y}px) rotate(${photo.initialRotation}deg)`,
                   transition:
@@ -302,6 +303,12 @@ export default function Photos() {
                 }}
                 onPointerDown={(event) => handlePointerDown(event, photo.id)}
                 onDoubleClick={() => handlePhotoDoubleClick(photo.id)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handlePhotoDoubleClick(photo.id);
+                  }
+                }}
               >
                 <div className="flex flex-col overflow-hidden rounded-sm border border-neutral-200 bg-white shadow-md shadow-neutral-300/50 dark:border-neutral-700 dark:bg-neutral-950 dark:shadow-black/40">
                   <div className="relative aspect-square w-full bg-neutral-200/80 dark:bg-neutral-800/80">
@@ -314,13 +321,15 @@ export default function Photos() {
                     />
                   </div>
                   <div className="space-y-0.5 px-3 pb-3 pt-2">
-                    <p className="text-xs font-semibold leading-tight">{photo.title}</p>
+                    <p className="text-xs font-semibold leading-tight">
+                      {photo.title}
+                    </p>
                     <p className="text-[11px] leading-snug text-muted-foreground">
                       {photo.description}
                     </p>
                   </div>
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>
@@ -329,20 +338,25 @@ export default function Photos() {
       {isMounted &&
         focusedPhotoId !== null &&
         createPortal(
-          <div
-            className={`fixed inset-0 z-999 flex min-h-dvh items-center justify-center bg-black/40 p-4 backdrop-blur-sm transition-opacity duration-200 ${isFocusedVisible ? "opacity-100" : "opacity-0"
+          <div className="fixed inset-0 z-999 flex min-h-dvh items-center justify-center p-4">
+            <button
+              type="button"
+              className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-200 ${
+                isFocusedVisible ? "opacity-100" : "opacity-0"
               }`}
-            onClick={handleCloseFocused}
-          >
+              aria-label="Close image preview"
+              onClick={handleCloseFocused}
+            />
             <div
-              className={`relative w-full max-w-3xl cursor-default overflow-hidden rounded-md bg-white/95 shadow-2xl shadow-black/40 transform-gpu transition-all duration-200 ease-out dark:bg-neutral-950/95 ${isFocusedVisible
+              className={`relative z-10 w-full max-w-3xl cursor-default overflow-hidden rounded-md bg-white/95 shadow-2xl shadow-black/40 transform-gpu transition-all duration-200 ease-out dark:bg-neutral-950/95 ${
+                isFocusedVisible
                   ? "opacity-100 scale-100 translate-y-0"
                   : "opacity-0 scale-95 translate-y-1"
-                }`}
-              onClick={(e) => e.stopPropagation()}
+              }`}
             >
               {(() => {
-                const photo = PHOTOS.find((p) => p.id === focusedPhotoId)!;
+                const photo = PHOTOS.find((p) => p.id === focusedPhotoId);
+                if (photo == null) return null;
                 return (
                   <>
                     <Button
@@ -370,7 +384,9 @@ export default function Photos() {
                       </div>
 
                       <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/70 via-black/25 to-transparent p-4 pt-10 text-white">
-                        <p className="text-sm font-semibold leading-tight">{photo.title}</p>
+                        <p className="text-sm font-semibold leading-tight">
+                          {photo.title}
+                        </p>
                         <p className="mt-1 text-xs leading-snug text-white/80">
                           {photo.description}
                         </p>
@@ -386,4 +402,3 @@ export default function Photos() {
     </Section>
   );
 }
-

@@ -2,15 +2,15 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import {
-  type Book,
-  type BookStatus,
-  BOOK_STATUS_LABEL,
-  bookActivityTime,
-} from "@/lib/book-utils";
-import { Button } from "@/components/ui/button";
 import { StaggerContainer } from "@/components/stagger-container";
 import { AnimatedTextLink } from "@/components/ui/animated-text-link";
+import { Button } from "@/components/ui/button";
+import {
+  BOOK_STATUS_LABEL,
+  type Book,
+  type BookStatus,
+  bookActivityTime,
+} from "@/lib/book-utils";
 import { cn } from "@/lib/utils";
 
 type FilterKey = "all" | BookStatus;
@@ -32,13 +32,17 @@ export function BooksClient({ books }: { books: Book[] }) {
 
   return (
     <div className="min-h-screen px-4 lg:px-0 grid grid-cols-1 md:grid-cols-5 gap-20 pt-20 pb-20 max-w-4xl mx-auto">
-      <StaggerContainer className="h-fit md:sticky md:top-6 md:col-span-2" delayStep={100}>
+      <StaggerContainer
+        className="h-fit md:sticky md:top-6 md:col-span-2"
+        delayStep={100}
+      >
         <AnimatedTextLink href="/" arrowSide="left">
           Books
         </AnimatedTextLink>
 
         <p className="leading-relaxed text-xs text-neutral-700 dark:text-neutral-300 mt-2">
-          These are books I have read, am reading, or want to read. They consist of philosophy, software engineering, and historical classics.
+          These are books I have read, am reading, or want to read. They consist
+          of philosophy, software engineering, and historical classics.
         </p>
 
         <div
@@ -81,9 +85,14 @@ export function BooksClient({ books }: { books: Book[] }) {
         </div>
       </StaggerContainer>
 
-      <StaggerContainer className="flex flex-col gap-4 md:col-span-3 md:pl-20" delayStep={100}>
+      <StaggerContainer
+        className="flex flex-col gap-4 md:col-span-3 md:pl-20"
+        delayStep={100}
+      >
         {visible.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No books in this list yet.</p>
+          <p className="text-sm text-muted-foreground">
+            No books in this list yet.
+          </p>
         ) : (
           <ul className="flex flex-col gap-10">
             {visible.map((book) => (
@@ -104,7 +113,9 @@ export function BooksClient({ books }: { books: Book[] }) {
                         <h2 className="line-clamp-2 text-base font-medium tracking-tight underline decoration-transparent underline-offset-2 transition-colors duration-300 group-hover:decoration-foreground">
                           {book.title}
                         </h2>
-                        <p className="mt-0.5 text-sm text-muted-foreground">{book.author}</p>
+                        <p className="mt-0.5 text-sm text-muted-foreground">
+                          {book.author}
+                        </p>
                         {book.summary && (
                           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                             {book.summary}
@@ -115,13 +126,20 @@ export function BooksClient({ books }: { books: Book[] }) {
                         <span className="w-fit rounded-sm border border-border/60 bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-400">
                           {BOOK_STATUS_LABEL[book.status]}
                         </span>
-                        <time dateTime={new Date(bookActivityTime(book)).toISOString()}>
+                        <time
+                          dateTime={new Date(
+                            bookActivityTime(book),
+                          ).toISOString()}
+                        >
                           Updated{" "}
-                          {new Date(bookActivityTime(book)).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
+                          {new Date(bookActivityTime(book)).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            },
+                          )}
                         </time>
                       </div>
                     </div>

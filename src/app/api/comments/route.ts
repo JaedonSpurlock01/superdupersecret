@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { Prisma } from "@/generated/prisma/client";
-import type { Comment } from "@/generated/prisma/client";
 import { auth } from "@/auth";
+import type { Comment } from "@/generated/prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 import type { CommentsListJson } from "@/lib/comments/api-types";
 import {
   buildLikeMaps,

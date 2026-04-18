@@ -1,6 +1,7 @@
 "use client";
 
-import React, {
+import type React from "react";
+import {
   createContext,
   useCallback,
   useContext,
@@ -28,7 +29,8 @@ function getInitialTheme(): Theme {
   const stored = localStorage.getItem("theme");
   if (stored === "dark" || stored === "light") return stored;
 
-  const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
+  const prefersDark =
+    window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
   return prefersDark ? "dark" : "light";
 }
 
@@ -57,7 +59,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     [currentTheme, setTheme, toggleTheme],
   );
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+  );
 }
 
 export function useTheme() {

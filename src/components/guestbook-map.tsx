@@ -75,13 +75,20 @@ function prepareMap(map: MapJson): PreparedMap {
 
 const prepared = prepareMap(mapData as MapJson);
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
 type GuestbookMapProps = {
   onDotClick?: (id: string) => void;
   dotCommentCounts?: Record<string, number>;
 };
 
-export function GuestbookMap({ onDotClick, dotCommentCounts }: GuestbookMapProps) {
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+export function GuestbookMap({
+  onDotClick,
+  dotCommentCounts,
+}: GuestbookMapProps) {
+  const [_selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const viewBoxRef = useRef<{ x: number; y: number }>({
@@ -139,16 +146,13 @@ export function GuestbookMap({ onDotClick, dotCommentCounts }: GuestbookMapProps
     return "#1d4ed8"; // dark blue
   };
 
-  const clamp = (value: number, min: number, max: number) =>
-    Math.min(max, Math.max(min, value));
-
-  const getVisibleDimensions = () => {
+  const getVisibleDimensions = useCallback(() => {
     const zoom = zoomRef.current || 1;
     return {
       width: prepared.viewWidth / zoom,
       height: prepared.viewHeight / zoom,
     };
-  };
+  }, []);
 
   const handleMouseDown = useCallback(
     (event: React.MouseEvent<SVGSVGElement>) => {
@@ -178,7 +182,7 @@ export function GuestbookMap({ onDotClick, dotCommentCounts }: GuestbookMapProps
         clientY: event.clientY,
       };
     },
-    [],
+    [getVisibleDimensions],
   );
 
   const handleMouseMove = useCallback(
@@ -222,7 +226,7 @@ export function GuestbookMap({ onDotClick, dotCommentCounts }: GuestbookMapProps
         clientY: event.clientY,
       };
     },
-    [dragState],
+    [dragState, getVisibleDimensions],
   );
 
   const handleMouseUpOrLeave = useCallback(() => {
@@ -276,14 +280,13 @@ export function GuestbookMap({ onDotClick, dotCommentCounts }: GuestbookMapProps
 
     setDragState(null);
     lastMoveRef.current = null;
-  }, [dragState]);
+  }, [dragState, getVisibleDimensions]);
 
   const handleWheel = useCallback(
     (event: React.WheelEvent<HTMLDivElement>) => {
       event.preventDefault();
       event.stopPropagation();
 
-      const rect = event.currentTarget.getBoundingClientRect();
       const { width, height } = getVisibleDimensions();
 
       // Current center in SVG units
@@ -321,7 +324,7 @@ export function GuestbookMap({ onDotClick, dotCommentCounts }: GuestbookMapProps
         );
       }
     },
-    [],
+    [getVisibleDimensions],
   );
 
   // Initialize the SVG viewBox once on mount so React doesn't override
@@ -333,7 +336,7 @@ export function GuestbookMap({ onDotClick, dotCommentCounts }: GuestbookMapProps
         `${viewBoxRef.current.x} ${viewBoxRef.current.y} ${width} ${height}`,
       );
     }
-  }, []);
+  }, [getVisibleDimensions]);
   return (
     <div
       className="relative h-160 w-full overflow-hidden overscroll-none"
@@ -347,6 +350,7 @@ export function GuestbookMap({ onDotClick, dotCommentCounts }: GuestbookMapProps
         onMouseUp={handleMouseUpOrLeave}
         onMouseLeave={handleMouseUpOrLeave}
       >
+        <title>Guestbook map: pan and zoom to explore entries</title>
         <rect
           x={0}
           y={0}
@@ -355,12 +359,12 @@ export function GuestbookMap({ onDotClick, dotCommentCounts }: GuestbookMapProps
           fill="none"
         />
         {prepared.dots.map((dot) => (
-          <circle
+          // biome-ignore lint/a11y/useSemanticElements: Map dots are SVG graphics; HTML <button> cannot be used inside <svg>.
+          <g
             key={dot.id}
-            cx={dot.x}
-            cy={dot.y}
-            r={0.5}
-            fill={getDotFill(dot.id)}
+            role="button"
+            tabIndex={0}
+            aria-label={`Guestbook location ${dot.id}`}
             style={{ cursor: "pointer" }}
             onMouseDown={(e) => e.stopPropagation()}
             onMouseEnter={() => setHoveredId(dot.id)}
@@ -371,10 +375,18 @@ export function GuestbookMap({ onDotClick, dotCommentCounts }: GuestbookMapProps
               e.stopPropagation();
               handleDotClick(dot.id);
             }}
-          />
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                e.stopPropagation();
+                handleDotClick(dot.id);
+              }
+            }}
+          >
+            <circle cx={dot.x} cy={dot.y} r={0.5} fill={getDotFill(dot.id)} />
+          </g>
         ))}
       </svg>
     </div>
   );
 }
-

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { StaggerContainer } from "@/components/stagger-container";
-import { Button } from "@/components/ui/button";
 import { AnimatedTextLink } from "@/components/ui/animated-text-link";
+import { Button } from "@/components/ui/button";
 
 export function GuestbookUnavailable() {
   return (
@@ -14,11 +14,7 @@ export function GuestbookUnavailable() {
           This page is currently not available.
         </p>
         <div className="mt-8">
-          <Button
-            size="sm"
-            nativeButton={false}
-            render={<Link href="/" />}
-          >
+          <Button size="sm" nativeButton={false} render={<Link href="/" />}>
             Back to home
           </Button>
         </div>

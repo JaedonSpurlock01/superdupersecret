@@ -6,4 +6,3 @@ export const currentLocation = {
     lng: -117.3788,
   },
 } as const;
-

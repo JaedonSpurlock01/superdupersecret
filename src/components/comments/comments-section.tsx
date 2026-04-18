@@ -4,7 +4,6 @@ import {
   Delete02Icon,
   MoreHorizontalIcon,
   PencilEdit01Icon,
-  PencilIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
@@ -298,10 +297,7 @@ function ReplyThread({
           return (
             <div key={r.id} className="relative flex gap-3">
               <div className="relative z-10 flex size-6 shrink-0 justify-center pt-0.5">
-                <UserAvatar
-                  src={r.author.image}
-                  name={r.author.name}
-                />
+                <UserAvatar src={r.author.image} name={r.author.name} />
               </div>
               <div className="min-w-0 flex-1 pb-1">
                 <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
@@ -508,7 +504,7 @@ export function CommentsSection({ slug }: { slug: string }) {
   const canModify = (authorId: string) =>
     Boolean(
       session?.user?.id &&
-      (session.user.id === authorId || session.user.isCommentAdmin),
+        (session.user.id === authorId || session.user.isCommentAdmin),
     );
 
   const setEditDraft = (v: string) => {
@@ -549,11 +545,7 @@ export function CommentsSection({ slug }: { slug: string }) {
   };
 
   return (
-    <Section
-      id="comments"
-      title="Comments"
-      className="mt-16 scroll-mt-24"
-    >
+    <Section id="comments" title="Comments" className="mt-16 scroll-mt-24">
       <div className="mt-6 rounded-sm dark:bg-card/20">
         {status === "unauthenticated" && (
           <div className="mb-6 rounded-sm border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
