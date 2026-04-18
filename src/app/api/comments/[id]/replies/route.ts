@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import type { MoreRepliesJson } from "@/lib/comments/api-types";
 import { buildLikeMaps, toReplyJson } from "@/lib/comments/serialize";
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 
 const PAGE = 10;
 
@@ -40,6 +40,14 @@ export async function GET(
   req: Request,
   ctx: { params: Promise<{ id: string }> },
 ) {
+  const prisma = getPrismaClient();
+  if (!prisma) {
+    return NextResponse.json(
+      { error: "Comments are temporarily unavailable." },
+      { status: 503 },
+    );
+  }
+
   const { id: threadId } = await ctx.params;
   const { searchParams } = new URL(req.url);
   const cursorRaw = searchParams.get("cursor");

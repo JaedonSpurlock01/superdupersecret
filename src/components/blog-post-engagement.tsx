@@ -6,6 +6,8 @@ type BlogPostEngagementProps = {
   slug: string;
   initialCommentCount: number;
   initialViewCount: number;
+  /** When false, hides comment count and link (database unavailable). */
+  commentsEnabled?: boolean;
 };
 
 function scrollToComments() {
@@ -18,11 +20,13 @@ export function BlogPostEngagement({
   slug,
   initialCommentCount,
   initialViewCount,
+  commentsEnabled = true,
 }: BlogPostEngagementProps) {
   const [viewCount, setViewCount] = useState(initialViewCount);
   const recorded = useRef(false);
 
   useEffect(() => {
+    if (!commentsEnabled) return;
     if (recorded.current) return;
     recorded.current = true;
     void (async () => {
@@ -41,11 +45,24 @@ export function BlogPostEngagement({
         // keep initialViewCount
       }
     })();
-  }, [slug]);
+  }, [slug, commentsEnabled]);
 
   const commentLabel =
     initialCommentCount === 1 ? "1 comment" : `${initialCommentCount} comments`;
   const viewLabel = viewCount === 1 ? "1 view" : `${viewCount} views`;
+
+  if (!commentsEnabled) {
+    return (
+      <div>
+        <dt className="text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+          Views
+        </dt>
+        <dd className="mt-2 text-neutral-700 dark:text-neutral-300">
+          {viewLabel}
+        </dd>
+      </div>
+    );
+  }
 
   return (
     <div>

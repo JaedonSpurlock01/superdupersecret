@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { isCommentAdmin } from "@/lib/comments/admin";
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 
 function canModifyComment(
   authorId: string,
@@ -20,6 +20,14 @@ export async function PATCH(
   }
 
   const { id } = await ctx.params;
+
+  const prisma = getPrismaClient();
+  if (!prisma) {
+    return NextResponse.json(
+      { error: "Comments are temporarily unavailable." },
+      { status: 503 },
+    );
+  }
 
   const comment = await prisma.comment.findUnique({ where: { id } });
   if (!comment) {
@@ -100,6 +108,14 @@ export async function DELETE(
   }
 
   const { id } = await ctx.params;
+
+  const prisma = getPrismaClient();
+  if (!prisma) {
+    return NextResponse.json(
+      { error: "Comments are temporarily unavailable." },
+      { status: 503 },
+    );
+  }
 
   const comment = await prisma.comment.findUnique({ where: { id } });
   if (!comment) {

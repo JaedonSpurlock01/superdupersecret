@@ -11,11 +11,13 @@ import {
     UserGroupIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useDatabaseFeatures } from "@/components/database-features-provider";
 import { useTheme } from "@/components/theme-provider";
 import Image from "next/image";
 
 export default function PageHeader() {
     const { currentTheme, toggleTheme } = useTheme();
+    const { databaseAvailable } = useDatabaseFeatures();
     const isDark = currentTheme === "dark";
 
     return (
@@ -30,11 +32,13 @@ export default function PageHeader() {
                             <HugeiconsIcon icon={LicenseDraftIcon} /> Blog
                         </Button>
                     </Link>
+                    {databaseAvailable && (
                     <Link href="/guestbook">
                         <Button variant="ghost" size="lg">
                             <HugeiconsIcon icon={UserGroupIcon} /> Guestbook
                         </Button>
                     </Link>
+                    )}
                     <Button
                         type="button"
                         variant="ghost"

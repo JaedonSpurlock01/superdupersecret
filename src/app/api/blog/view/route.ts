@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isValidBlogSlug } from "@/lib/comments/slug";
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
@@ -22,6 +22,14 @@ export async function POST(req: Request) {
 
   if (!isValidBlogSlug(slug)) {
     return NextResponse.json({ error: "Invalid slug" }, { status: 400 });
+  }
+
+  const prisma = getPrismaClient();
+  if (!prisma) {
+    return NextResponse.json(
+      { error: "View counts are temporarily unavailable." },
+      { status: 503 },
+    );
   }
 
   try {

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import Section from "./section";
+import { useDatabaseFeatures } from "@/components/database-features-provider";
 import { info, socials } from "@/lib/data/personal";
 import { LocationMap } from "./location-map";
 import Link from "next/link";
@@ -57,6 +58,7 @@ export function InfoActionButton({
 
 export default function Info() {
     const { currentTheme, toggleTheme } = useTheme();
+    const { databaseAvailable } = useDatabaseFeatures();
     const isDark = currentTheme === "dark";
 
     return (
@@ -134,6 +136,7 @@ export default function Info() {
                         }
                     /> */}
 
+                    {databaseAvailable && (
                     <InfoActionButton
                         tooltip="Guestbook"
                         ariaLabel="Open guestbook"
@@ -144,6 +147,7 @@ export default function Info() {
                             </svg>
                         }
                     />
+                    )}
 
                     <InfoActionButton
                         tooltip={isDark ? "Light mode" : "Dark mode"}

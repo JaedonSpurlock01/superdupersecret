@@ -9,7 +9,7 @@ import {
   toThreadJson,
 } from "@/lib/comments/serialize";
 import { isValidBlogSlug } from "@/lib/comments/slug";
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
@@ -20,6 +20,14 @@ export async function GET(req: Request) {
   const slug = searchParams.get("slug")?.trim() ?? "";
   if (!isValidBlogSlug(slug)) {
     return NextResponse.json({ error: "Invalid slug" }, { status: 400 });
+  }
+
+  const prisma = getPrismaClient();
+  if (!prisma) {
+    return NextResponse.json(
+      { error: "Comments are temporarily unavailable.", comments: [] },
+      { status: 503 },
+    );
   }
 
   try {
@@ -164,6 +172,14 @@ export async function POST(req: Request) {
   const trimmed = text.trim();
   if (trimmed.length < 1 || trimmed.length > 20_000) {
     return NextResponse.json({ error: "Invalid body length" }, { status: 400 });
+  }
+
+  const prisma = getPrismaClient();
+  if (!prisma) {
+    return NextResponse.json(
+      { error: "Comments are temporarily unavailable." },
+      { status: 503 },
+    );
   }
 
   if (parentId) {

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { isCommentAdmin } from "@/lib/comments/admin";
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 
 export async function PATCH(
   req: Request,
@@ -10,6 +10,14 @@ export async function PATCH(
   const session = await auth();
   if (!session?.user?.id || !isCommentAdmin(session.user.id)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const prisma = getPrismaClient();
+  if (!prisma) {
+    return NextResponse.json(
+      { error: "Comments are temporarily unavailable." },
+      { status: 503 },
+    );
   }
 
   const { id } = await ctx.params;

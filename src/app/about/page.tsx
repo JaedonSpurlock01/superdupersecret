@@ -21,15 +21,15 @@ export default function AboutPage() {
             <StaggerContainer className="h-fit md:sticky md:top-6 md:col-span-2" delayStep={100}>
                 <AnimatedTextLink href="/" arrowSide="left">About Me</AnimatedTextLink>
 
-                <div className="flex flex-col gap-2 [&>p]:text-xs [&>p]:text-neutral-700 [&>p]:dark:text-neutral-300">
+                <div className="flex flex-col gap-4 my-4 [&>p]:text-sm [&>p]:text-neutral-700 [&>p]:dark:text-neutral-300">
                     <p>
                         Hello, I'm Jaedon! I'm a software engineer with a passion for building products that solve problems at scale.
                     </p>
                     <p>
-                        Currently, I work at Lockheed Martin RMS building software to help automate business processes.
+                        Currently, I work at Lockheed Martin in Orlando, Florida building software to help automate business processes.
                     </p>
                     <p>
-                        In my free time, I enjoy rock climbing, hiking, muay thai, and reading philosophy or historical classics.
+                        In my free time, I enjoy rock climbing, skiing, hiking, muay thai, and reading philosophy or historical classics.
                     </p>
                 </div>
 

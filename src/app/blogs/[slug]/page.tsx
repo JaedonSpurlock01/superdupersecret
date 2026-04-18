@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { BlogPostEngagement } from "@/components/blog-post-engagement";
 import { getAllBlogs, getBlogBySlug } from "@/lib/blog";
 import { getBlogPostStats } from "@/lib/blog-stats";
+import { isDatabaseAvailable } from "@/lib/database-availability";
 import { rehypePrettyCodeOptions } from "@/lib/mdx/rehype-pretty-code-options";
 import { BlogPostBack } from "./blog-post-back";
 
@@ -42,7 +43,10 @@ export default async function BlogPostPage({ params }: PageProps) {
   const post = await getBlogBySlug(slug);
   if (!post) notFound();
 
-  const stats = await getBlogPostStats(slug);
+  const [stats, databaseAvailable] = await Promise.all([
+    getBlogPostStats(slug),
+    isDatabaseAvailable(),
+  ]);
 
   const { content } = await compileMDX({
     source: post.content,
@@ -118,6 +122,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                   slug={slug}
                   initialCommentCount={stats.commentCount}
                   initialViewCount={stats.viewCount}
+                  commentsEnabled={databaseAvailable}
                 />
               </dl>
             </div>
@@ -127,7 +132,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             <article className="blog-prose prose prose-neutral prose-headings:tracking-tight prose-a:no-underline hover:prose-a:underline max-w-none dark:prose-invert">
               {content}
             </article>
-            <CommentsSection slug={slug} />
+            {databaseAvailable && <CommentsSection slug={slug} />}
           </div>
         </div>
       </StaggerContainer>

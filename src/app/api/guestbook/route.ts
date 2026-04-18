@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { isValidGuestbookDotId } from "@/lib/guestbook/dots";
 import type { GuestbookEntryJson, GuestbookListJson } from "@/lib/guestbook/types";
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
@@ -36,6 +36,14 @@ function isValidDeviceId(id: string): boolean {
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const deviceId = searchParams.get("deviceId")?.trim() ?? "";
+
+  const prisma = getPrismaClient();
+  if (!prisma) {
+    return NextResponse.json(
+      { error: "Guestbook is temporarily unavailable." },
+      { status: 503 },
+    );
+  }
 
   try {
     const minePromise =
@@ -129,6 +137,14 @@ export async function POST(req: Request) {
     );
   }
 
+  const prisma = getPrismaClient();
+  if (!prisma) {
+    return NextResponse.json(
+      { error: "Guestbook is temporarily unavailable." },
+      { status: 503 },
+    );
+  }
+
   try {
     const saved = await prisma.guestbookEntry.upsert({
       where: { deviceId },
@@ -173,6 +189,14 @@ export async function DELETE(req: Request) {
 
   if (!isValidDeviceId(deviceId)) {
     return NextResponse.json({ error: "Invalid device id" }, { status: 400 });
+  }
+
+  const prisma = getPrismaClient();
+  if (!prisma) {
+    return NextResponse.json(
+      { error: "Guestbook is temporarily unavailable." },
+      { status: 503 },
+    );
   }
 
   try {

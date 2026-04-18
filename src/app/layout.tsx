@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { AppPreviousPathTracker } from "@/components/app-previous-path-tracker";
+import { DatabaseFeaturesProvider } from "@/components/database-features-provider";
 import { SessionProvider } from "@/components/session-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { isDatabaseAvailable } from "@/lib/database-availability";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -24,11 +26,16 @@ export const metadata: Metadata = {
   description: "Jaedon Spurlock's Portfolio",
 };
 
-export default function RootLayout({
+/** DB health is checked per request so nav and guestbook reflect runtime availability. */
+export const dynamic = "force-dynamic";
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const databaseAvailable = await isDatabaseAvailable();
+
   return (
     <html
       lang="en"
@@ -58,8 +65,10 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <SessionProvider>
-            <AppPreviousPathTracker />
-            <TooltipProvider>{children}</TooltipProvider>
+            <DatabaseFeaturesProvider databaseAvailable={databaseAvailable}>
+              <AppPreviousPathTracker />
+              <TooltipProvider>{children}</TooltipProvider>
+            </DatabaseFeaturesProvider>
           </SessionProvider>
         </ThemeProvider>
       </body>

@@ -2,6 +2,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import type { PoolConfig } from "pg";
 import { Pool } from "pg";
 import { PrismaClient } from "@/generated/prisma/client";
+import { isDatabaseUrlConfigured } from "@/lib/database-url";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -14,7 +15,6 @@ function createPgPool(): Pool {
     throw new Error("DATABASE_URL is not set");
   }
 
-  // `prisma init` / docs often leave this example in .env — it is not a real user.
   if (
     /\/\/johndoe:/i.test(connectionString) ||
     /:randompassword@/i.test(connectionString)
@@ -49,8 +49,15 @@ function createPrismaClient(): PrismaClient {
   });
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
+/**
+ * Returns a Prisma client when DATABASE_URL is usable; otherwise null.
+ * Does not connect until the first query.
+ */
+export function getPrismaClient(): PrismaClient | null {
+  if (!isDatabaseUrlConfigured()) {
+    return null;
+  }
+  const client = globalForPrisma.prisma ?? createPrismaClient();
+  globalForPrisma.prisma = client;
+  return client;
 }
