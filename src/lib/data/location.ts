@@ -1,8 +1,8 @@
 export const currentLocation = {
-  name: "San Diego Metropolitan Area",
-  timezone: "America/Los_Angeles",
+  name: "Orlando, FL",
+  timezone: "America/New_York",
   coordinates: {
-    lat: 33.1977,
-    lng: -117.3788,
+    lat: 28.5383,
+    lng: -81.3792,
   },
 } as const;

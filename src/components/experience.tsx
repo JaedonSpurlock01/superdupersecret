@@ -16,13 +16,14 @@ export default function Experience() {
       <div className="relative mt-8 space-y-4">
         <div className="pointer-events-none absolute left-3 top-0 bottom-0 w-px bg-border mt-9.5" />
 
-        {work.map((item, index) => (
+        {work.map((item) => (
           <div key={`${item.company}-${item.date}`} className="flex gap-4">
             <div className="relative flex w-6 justify-center translate-y-5">
               <div
                 className={cn(
                   "z-10 mt-1 h-2.5 w-2.5 rounded-full bg-muted-foreground ring-3 ring-primary/15",
-                  index === 0 && "animate-pulse bg-green-500 ring-green-500/15",
+                  item.date.includes("Present") &&
+                    "animate-pulse bg-green-500 ring-green-500/15",
                 )}
               />
             </div>
@@ -40,8 +41,9 @@ export default function Experience() {
                           render={
                             <Link
                               href={item.href}
-                              target="_blank"
-                              rel="noreferrer"
+                              {...(item.href.startsWith("http")
+                                ? { target: "_blank", rel: "noreferrer" }
+                                : {})}
                               className="hover:underline text-xs text-neutral-700 dark:text-neutral-400 hover:text-blue-500"
                               aria-label={`Open ${item.company}`}
                             >
@@ -66,7 +68,8 @@ export default function Experience() {
                   alt={item.company}
                   width={35}
                   height={35}
-                  className="rounded-sm"
+                  className="size-[35px] rounded-sm object-cover"
+                  unoptimized={item.imageSrc.endsWith(".svg")}
                 />
               </div>
 

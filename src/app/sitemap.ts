@@ -13,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     isDatabaseAvailable(),
   ]);
 
-  const staticBase = ["", "/about", "/blogs", "/books"];
+  const staticBase = ["", "/about", "/blogs", "/books", "/spurlock-labs"];
   const staticRoutes = [
     ...staticBase,
     ...(databaseAvailable ? ["/guestbook"] : []),

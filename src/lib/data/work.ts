@@ -1,9 +1,31 @@
 export const work = [
   {
     company: "Lockheed Martin",
+    position: "Software Engineer",
+    location: "Orlando, FL",
+    date: "July 2026 - Present",
+    imageSrc: "/work/lockheed.jpeg",
+    href: "https://www.linkedin.com/company/lockheed-martin/",
+    description:
+      "Building lab automation software to help automate business processes at Rotary & Mission Systems.",
+    skills: ["react", "sveltekit", "postgresql"],
+  },
+  {
+    company: "Spurlock Labs",
+    position: "Founder",
+    location: "Remote",
+    date: "Present",
+    imageSrc: "/spurlocklabs.jpeg",
+    href: "/spurlock-labs",
+    description:
+      "A simple SaaS for building products that help businesses and personal users.",
+    skills: ["react", "typescript"],
+  },
+  {
+    company: "Lockheed Martin",
     position: "Software Engineer Intern",
     location: "Remote",
-    date: "Aug 2025 - Present",
+    date: "Aug 2025 - July 2026",
     imageSrc: "/work/lockheed.jpeg",
     href: "https://www.linkedin.com/company/welfie/",
     description:

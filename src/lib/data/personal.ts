@@ -10,7 +10,7 @@ export const info = {
   name: "Jaedon Spurlock",
   role: "Software Engineer",
   resume: "/resume.pdf",
-  location: "San Diego Metropolitan Area",
+  location: "Orlando, FL",
   description:
     "I'm a full-stack software engineer from Oceanside, California. I have industry experience in software engineering with experience in full-stack development, devops, and infrastructure (IaC).",
 } as const;
