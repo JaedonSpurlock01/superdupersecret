@@ -1,6 +1,8 @@
 import Image from "next/image";
+import Link from "next/link";
 import { StaggerContainer } from "@/components/stagger-container";
 import { AnimatedTextLink } from "@/components/ui/animated-text-link";
+import { SpurlockLabsRegistrationForm } from "./registration-form";
 
 export const metadata = {
   title: "Spurlock Labs",
@@ -54,13 +56,29 @@ export default function SpurlockLabsPage() {
               </li>
             </ul>
           </section>
+
+          <SpurlockLabsRegistrationForm />
         </StaggerContainer>
       </main>
 
       <footer className="border-t border-border px-4 py-6">
-        <p className="mx-auto max-w-4xl text-xs text-neutral-500 lg:px-0">
-          © 2026 Spurlock Labs. All rights reserved.
-        </p>
+        <div className="mx-auto flex max-w-4xl flex-col gap-3 text-xs text-neutral-500 sm:flex-row sm:items-center sm:justify-between lg:px-0">
+          <p>© 2026 Spurlock Labs. All rights reserved.</p>
+          <nav aria-label="Legal" className="flex flex-wrap gap-x-4 gap-y-2">
+            <Link
+              href="/spurlock-labs/privacy"
+              className="underline underline-offset-4 hover:text-neutral-800 dark:hover:text-neutral-200"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="/spurlock-labs/terms"
+              className="underline underline-offset-4 hover:text-neutral-800 dark:hover:text-neutral-200"
+            >
+              Terms of Service
+            </Link>
+          </nav>
+        </div>
       </footer>
     </div>
   );
