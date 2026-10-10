@@ -187,10 +187,10 @@ export default function SpurlockLabsTermsPage() {
                 </p>
                 <p className="mt-4">
                   <a
-                    href="mailto:support@jaedon.dev"
+                    href="mailto:spurjae@gmail.com"
                     className="font-medium text-neutral-950 underline underline-offset-4 hover:text-blue-600 dark:text-neutral-50 dark:hover:text-blue-400"
                   >
-                    support@jaedon.dev
+                    spurjae@gmail.com
                   </a>
                 </p>
                 <p className="mt-4 text-neutral-600 dark:text-neutral-400">
