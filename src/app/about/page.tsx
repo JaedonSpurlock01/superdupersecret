@@ -2,14 +2,10 @@ import Image from "next/image";
 import { InfoActionButton } from "@/components/info";
 import { StaggerContainer } from "@/components/stagger-container";
 import { AnimatedTextLink } from "@/components/ui/animated-text-link";
+import aboutJson from "@/lib/data/about.json";
 import { info, socials } from "@/lib/data/personal";
 
-const photoLinks = [
-  "/photos/3.jpg",
-  "/photos/4.jpg",
-  "/photos/5.jpg",
-  "/photos/6.jpg",
-];
+const { paragraphs, photos: photoLinks } = aboutJson;
 
 export default function AboutPage() {
   return (
@@ -23,18 +19,9 @@ export default function AboutPage() {
         </AnimatedTextLink>
 
         <div className="flex flex-col gap-4 my-4 [&>p]:text-sm [&>p]:text-neutral-700 [&>p]:dark:text-neutral-300">
-          <p>
-            Hello, I'm Jaedon! I'm a software engineer with a passion for
-            building products that solve problems at scale.
-          </p>
-          <p>
-            Currently, I work at Lockheed Martin in Orlando, Florida building
-            software to help automate business processes.
-          </p>
-          <p>
-            In my free time, I enjoy rock climbing, skiing, hiking, muay thai,
-            and reading philosophy or historical classics.
-          </p>
+          {paragraphs.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -114,14 +101,14 @@ export default function AboutPage() {
         className="flex flex-col gap-4 md:col-span-3 md:pl-20"
         delayStep={100}
       >
-        {photoLinks.map((link) => (
+        {photoLinks.map((link, index) => (
           <div
-            key={link}
+            key={`${index}-${link}`}
             className="relative aspect-video w-full overflow-hidden bg-muted rounded-md h-[300px]"
           >
             <Image
               src={link}
-              alt={link}
+              alt={`About me photo ${index + 1}`}
               fill
               sizes="(min-width: 768px) 50vw, 100vw"
               className="object-cover transition duration-300 group-hover:scale-105"
