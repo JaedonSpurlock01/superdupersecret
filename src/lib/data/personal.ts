@@ -1,3 +1,5 @@
+import aboutJson from "@/lib/data/about.json";
+
 export const socials = {
   email: "jaedonaspurlock@outlook.com",
   linkedin: "https://www.linkedin.com/in/jaedon-spurlock/",
@@ -11,8 +13,7 @@ export const info = {
   role: "Software Engineer",
   resume: "/resume.pdf",
   location: "Orlando, FL",
-  description:
-    "I'm a full-stack software engineer from Oceanside, California. I have industry experience in software engineering with experience in full-stack development, devops, and infrastructure (IaC).",
+  description: aboutJson.summary,
 } as const;
 
 export const education = {

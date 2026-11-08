@@ -1,11 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { compileMDX } from "next-mdx-remote/rsc";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import rehypePrettyCode from "rehype-pretty-code";
-import rehypeSlug from "rehype-slug";
-import remarkGfm from "remark-gfm";
-import { useMDXComponents } from "@/../mdx-components";
 import { BlogPostEngagement } from "@/components/blog-post-engagement";
 import { CommentsSection } from "@/components/comments";
 import { StaggerContainer } from "@/components/stagger-container";
@@ -13,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { getAllBlogs, getBlogBySlug } from "@/lib/blog";
 import { getBlogPostStats } from "@/lib/blog-stats";
 import { isDatabaseAvailable } from "@/lib/database-availability";
-import { rehypePrettyCodeOptions } from "@/lib/mdx/rehype-pretty-code-options";
+import { compileBlogMdx } from "@/lib/mdx/compile-blog-mdx";
 import { BlogPostBack } from "./blog-post-back";
 
 type PageProps = {
@@ -48,21 +42,7 @@ export default async function BlogPostPage({ params }: PageProps) {
     isDatabaseAvailable(),
   ]);
 
-  const { content } = await compileMDX({
-    source: post.content,
-    components: useMDXComponents({}),
-    options: {
-      parseFrontmatter: false,
-      mdxOptions: {
-        remarkPlugins: [remarkGfm],
-        rehypePlugins: [
-          rehypeSlug,
-          [rehypeAutolinkHeadings, { behavior: "append" }],
-          [rehypePrettyCode, rehypePrettyCodeOptions],
-        ],
-      },
-    },
-  });
+  const content = await compileBlogMdx(post.content);
 
   return (
     <main className="min-h-screen px-4 lg:px-0 pt-20 pb-20">
