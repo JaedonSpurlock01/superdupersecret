@@ -7,13 +7,28 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { Badge } from "@/components/ui/badge";
 import { useTheme } from "./theme-provider";
 
-const DEFAULT_MAP_STYLE =
+const LIGHT_MAP_STYLE =
   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
+const DARK_MAP_STYLE =
+  "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+
+/**
+ * The <html> class is the source of truth: the inline script in layout sets it
+ * before paint, and ThemeProvider updates it synchronously on toggle. React's
+ * `currentTheme` starts as "light" until ThemeProvider's layout effect runs, so
+ * reading it here would briefly pick the wrong style.
+ */
+function getMapStyleForDocument() {
+  return document.documentElement.classList.contains("dark")
+    ? DARK_MAP_STYLE
+    : LIGHT_MAP_STYLE;
+}
 
 export function LocationMap() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const compassDblClickCleanupRef = useRef<(() => void) | null>(null);
+  const appliedStyleRef = useRef<string | null>(null);
   const [timeString, setTimeString] = useState<string>("");
   const { currentTheme } = useTheme();
   const isDark = currentTheme === "dark";
@@ -55,9 +70,12 @@ export function LocationMap() {
       pitch: 0,
     };
 
+    const initialStyle = getMapStyleForDocument();
+    appliedStyleRef.current = initialStyle;
+
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
-      style: DEFAULT_MAP_STYLE,
+      style: initialStyle,
       center: [lng, lat],
       zoom: 1.5,
       attributionControl: false,
@@ -123,17 +141,24 @@ export function LocationMap() {
       compassDblClickCleanupRef.current = null;
       map.remove();
       mapRef.current = null;
+      appliedStyleRef.current = null;
     };
   }, []);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: isDark is the trigger; the style is read from the <html> class.
   useEffect(() => {
-    if (!mapRef.current) return;
+    const map = mapRef.current;
+    if (!map) return;
 
-    const style = isDark
-      ? "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
-      : "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
+    const style = getMapStyleForDocument();
+    if (appliedStyleRef.current === style) return;
+    appliedStyleRef.current = style;
 
-    mapRef.current.setStyle(style);
+    // diff: false replaces the style outright and aborts any in-flight style
+    // request, so the last call always wins. With diffing, overlapping
+    // setStyle calls race on their JSON fetches and a stale light style can
+    // land after the dark one.
+    map.setStyle(style, { diff: false });
   }, [isDark]);
 
   return (
