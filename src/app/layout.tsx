@@ -1,6 +1,6 @@
 import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist_Mono, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import { AppPreviousPathTracker } from "@/components/app-previous-path-tracker";
 import { DatabaseFeaturesProvider } from "@/components/database-features-provider";
@@ -10,11 +10,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { isDatabaseAvailable } from "@/lib/database-availability";
 import { cn } from "@/lib/utils";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
+  variable: "--font-sans",
 });
 
 const geistMono = Geist_Mono({
@@ -40,7 +38,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("font-sans", inter.variable)}
+      className={cn("font-sans", instrumentSans.variable)}
       suppressHydrationWarning
     >
       <head>
@@ -62,7 +60,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased dark:bg-neutral-900 bg-neutral-100 font-sans`}
+        className={`${geistMono.variable} antialiased dark:bg-neutral-900 bg-neutral-100 font-sans`}
       >
         <ThemeProvider>
           <SessionProvider>
