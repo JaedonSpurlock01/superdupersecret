@@ -64,7 +64,7 @@ export function InfoActionButton({
 }
 
 export default function Info() {
-  const { currentTheme, toggleTheme } = useTheme();
+  const { currentTheme, toggleTheme, toggleSpace } = useTheme();
   const { databaseAvailable } = useDatabaseFeatures();
   const isDark = currentTheme === "dark";
 
@@ -88,7 +88,17 @@ export default function Info() {
       </div>
 
       <div className="p-4 *:text-center mt-12 space-y-1.5" data-hero="text">
-        <h1 className="text-xl font-bold">{info.name}</h1>
+        <h1 className="text-xl font-bold">
+          {/* Easter egg: clicking my name sets off the supernova (see SpaceMode). */}
+          <button
+            type="button"
+            onClick={toggleSpace}
+            data-name
+            className="cursor-text select-text font-bold outline-none focus-visible:ring-2 focus-visible:ring-ring/50 rounded-sm"
+          >
+            {info.name}
+          </button>
+        </h1>
         <p className="text-sm text-muted-foreground">{info.role}</p>
         <p className="text-sm text-muted-foreground">{info.location}</p>
         <LocalStatus className="text-xs text-muted-foreground/80 text-balance" />

@@ -161,6 +161,8 @@
 /* Motion tokens */
 :root {
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  /* Strong ease-in-out, for things that move while staying on screen. */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-pop: cubic-bezier(0.34, 1.45, 0.64, 1);
   /* iOS-like sheet curve: long travel that starts fast and settles softly. */
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
@@ -718,5 +720,368 @@ html[data-about-photo] .music-cover {
     figure[data-rehype-pretty-code-figure]
     [data-rehype-pretty-code-title] {
     @apply mb-2 rounded-t-sm border border-b-0 border-border bg-muted/60 px-3 py-1.5 font-mono text-xs font-medium text-muted-foreground;
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/* Space mode: hidden starfield with a supernova (see SpaceMode). Konami code
+   or a click on my name. Keeps the dark theme's neutrals (ThemeProvider sets
+   .dark too) and adds blue only in the sky. */
+
+html.space-mode {
+  --sp-void: #0a0a0b;
+  --sp-ice: 219 234 254; /* blue-100 */
+  --sp-sky: 147 197 253; /* blue-300 */
+  --sp-blue: 59 130 246; /* blue-500 */
+  --sp-deep: 30 64 175; /* blue-800 */
+  --sp-indigo: 129 140 248; /* indigo-400 */
+
+  /* Where the supernova sits: the empty space under the profile card. */
+  --sp-x: max(150px, calc(50% - 285px));
+  --sp-y: max(80%, 640px);
+  --sp-size: min(46vmin, 400px);
+  /* How far the supernova drifts up while the page scrolls (see SpaceMode). */
+  --sp-drift: 80px;
+
+  background: var(--sp-void);
+  color-scheme: dark;
+}
+
+@media (max-width: 767px) {
+  /* One column: tuck it into the top-right corner, above the card. */
+  html.space-mode {
+    --sp-x: 84%;
+    --sp-y: 44px;
+    --sp-size: 220px;
+    --sp-drift: 28px;
+  }
+}
+
+html.space-mode body {
+  background: transparent;
+  text-shadow: 0 0 8px rgb(10 10 11 / 0.85);
+}
+
+/* The profile card floats over the sky instead of showing it through. */
+html.space-mode .hero-card > section {
+  background: rgb(23 23 23 / 0.6);
+  backdrop-filter: blur(10px);
+}
+
+.space-scene {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      90vmax 70vmax at var(--sp-x) var(--sp-y),
+      rgb(var(--sp-deep) / 0.16),
+      transparent 70%
+    ), var(--sp-void);
+}
+
+/* The lens: it pulls back once as the supernova goes off, then keeps a slow
+   push-in and a slight roll going on different clocks so the move never
+   visibly repeats. The orbit itself happens in the canvas (lib/space-sky). */
+.sp-camera {
+  position: absolute;
+  inset: 0;
+  animation:
+    sp-camera-in 2600ms var(--ease-out) both,
+    sp-camera-push 61s var(--ease-in-out) 2600ms infinite alternate,
+    sp-camera-roll 47s var(--ease-in-out) infinite alternate;
+}
+
+@keyframes sp-camera-in {
+  from {
+    scale: 1.14;
+  }
+}
+
+@keyframes sp-camera-push {
+  to {
+    scale: 1.07;
+  }
+}
+
+@keyframes sp-camera-roll {
+  from {
+    rotate: -1.2deg;
+  }
+  to {
+    rotate: 1.2deg;
+  }
+}
+
+/* The 3D sky (see lib/space-sky): stars and debris, drawn from a camera
+   that orbits the supernova. */
+.sp-sky {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Invisible marker the canvas measures to find the supernova. */
+.sp-anchor {
+  position: absolute;
+  left: var(--sp-x);
+  top: var(--sp-y);
+  width: var(--sp-size);
+  height: 0;
+}
+
+/* A second, fainter cloud so the far corner isn't empty. */
+.sp-haze {
+  position: absolute;
+  right: -10%;
+  top: -15%;
+  width: 70vmax;
+  aspect-ratio: 1.4;
+  background: radial-gradient(
+    closest-side,
+    rgb(var(--sp-indigo) / 0.09),
+    rgb(var(--sp-deep) / 0.06) 50%,
+    transparent
+  );
+  translate: 0 calc(var(--sp-p, 0) * -140px);
+}
+
+@media (max-width: 767px) {
+  .sp-haze {
+    right: auto;
+    left: -30%;
+    top: 55%;
+  }
+}
+
+/* Zero-size anchor; every part of the supernova is centred on it. */
+.sp-nova {
+  position: absolute;
+  left: var(--sp-x);
+  top: var(--sp-y);
+  translate: 0 calc(var(--sp-p, 0) * var(--sp-drift) * -1);
+}
+
+.sp-nova > * {
+  position: absolute;
+  left: 0;
+  top: 0;
+  translate: -50% -50%;
+  border-radius: 50%;
+  aspect-ratio: 1;
+}
+
+.sp-nebula {
+  width: calc(var(--sp-size) * 2.1);
+  background: radial-gradient(
+    closest-side,
+    rgb(var(--sp-sky) / 0.2),
+    rgb(var(--sp-blue) / 0.13) 30%,
+    rgb(var(--sp-deep) / 0.08) 60%,
+    transparent
+  );
+}
+
+/* The expanding remnant: a lumpy conic ring, warped into filaments. */
+.sp-shell {
+  width: var(--sp-size);
+  background: conic-gradient(
+    from 40deg,
+    rgb(var(--sp-sky) / 0),
+    rgb(var(--sp-sky) / 0.6) 11%,
+    rgb(var(--sp-ice) / 0.85) 19%,
+    rgb(var(--sp-blue) / 0.35) 31%,
+    rgb(var(--sp-indigo) / 0.55) 46%,
+    rgb(var(--sp-sky) / 0.12) 57%,
+    rgb(var(--sp-ice) / 0.7) 70%,
+    rgb(var(--sp-blue) / 0.3) 84%,
+    rgb(var(--sp-sky) / 0)
+  );
+  mask-image: radial-gradient(
+    closest-side,
+    transparent 56%,
+    #000 70%,
+    transparent 90%
+  );
+  filter: url(#sp-warp);
+  animation: sp-turn 160s linear infinite;
+}
+
+.sp-shell-outer {
+  width: calc(var(--sp-size) * 1.45);
+  opacity: 0.45;
+  mask-image: radial-gradient(
+    closest-side,
+    transparent 62%,
+    #000 78%,
+    transparent 96%
+  );
+  animation-duration: 240s;
+  animation-direction: reverse;
+}
+
+@keyframes sp-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+
+/* Faint shock fronts that keep leaving the core. */
+.sp-wave {
+  width: var(--sp-size);
+  border: 1px solid rgb(var(--sp-sky) / 0.5);
+  opacity: 0;
+  animation: sp-wave 11s cubic-bezier(0.15, 0.6, 0.3, 1) infinite;
+}
+
+.sp-wave-late {
+  animation-delay: -5.5s;
+}
+
+@keyframes sp-wave {
+  from {
+    scale: 0.05;
+    opacity: 0.7;
+  }
+  to {
+    scale: 2.6;
+    opacity: 0;
+  }
+}
+
+.sp-core {
+  width: 5px;
+  background: #fff;
+  box-shadow:
+    0 0 6px 2px #fff,
+    0 0 22px 8px rgb(var(--sp-ice) / 0.85),
+    0 0 70px 26px rgb(var(--sp-blue) / 0.4);
+  animation: sp-pulse 3.8s ease-in-out infinite alternate;
+}
+
+/* Diffraction spikes. */
+.sp-core::before,
+.sp-core::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--sp-size) * 0.62);
+  height: 1px;
+  translate: -50% -50%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(var(--sp-ice) / 0.9) 45%,
+    #fff 50%,
+    rgb(var(--sp-ice) / 0.9) 55%,
+    transparent
+  );
+}
+
+.sp-core::after {
+  rotate: 90deg;
+}
+
+@keyframes sp-pulse {
+  from {
+    scale: 0.9;
+    opacity: 0.85;
+  }
+  to {
+    scale: 1.12;
+    opacity: 1;
+  }
+}
+
+/* The moment it goes off: one soft flash when the mode turns on. */
+.sp-flash {
+  width: var(--sp-size);
+  background: radial-gradient(
+    closest-side,
+    #fff,
+    rgb(var(--sp-ice) / 0.8) 25%,
+    rgb(var(--sp-blue) / 0.35) 55%,
+    transparent
+  );
+  opacity: 0;
+  animation: sp-flash 1100ms var(--ease-out) both;
+}
+
+@keyframes sp-flash {
+  from {
+    scale: 0.05;
+    opacity: 0.9;
+  }
+  to {
+    scale: 3.2;
+    opacity: 0;
+  }
+}
+
+/* Terminal readout, bottom left. */
+.sp-hud {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 50;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgb(23 23 23 / 0.7);
+  backdrop-filter: blur(8px);
+  color: var(--muted-foreground);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  text-shadow: none;
+  animation: fade-in 400ms ease 300ms both;
+}
+
+.sp-hud-prompt {
+  color: rgb(var(--sp-sky));
+}
+
+.sp-hud-dim {
+  opacity: 0.5;
+}
+
+.sp-hud-button {
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.sp-hud-button:focus-visible {
+  outline: 1px solid rgb(var(--sp-sky));
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sp-hud-button:hover {
+    color: var(--foreground);
+  }
+}
+
+@media (max-width: 480px) {
+  .sp-hud-wide {
+    display: none;
+  }
+}
+
+/* Reduced motion: the sky holds still. The canvas draws one frame, and the
+   lens, rotation, shock fronts and flash all go. */
+@media (prefers-reduced-motion: reduce) {
+  .sp-camera,
+  .sp-shell,
+  .sp-core {
+    animation: none;
+  }
+
+  .sp-wave,
+  .sp-flash {
+    display: none;
   }
 }

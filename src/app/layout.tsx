@@ -5,6 +5,7 @@ import "./globals.css";
 import { AppPreviousPathTracker } from "@/components/app-previous-path-tracker";
 import { DatabaseFeaturesProvider } from "@/components/database-features-provider";
 import { SessionProvider } from "@/components/session-provider";
+import { SpaceMode } from "@/components/space-mode";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { isDatabaseAvailable } from "@/lib/database-availability";
@@ -72,6 +73,7 @@ export default async function RootLayout({
             <DatabaseFeaturesProvider databaseAvailable={databaseAvailable}>
               <AppPreviousPathTracker />
               <TooltipProvider>{children}</TooltipProvider>
+              <SpaceMode />
             </DatabaseFeaturesProvider>
           </SessionProvider>
         </ThemeProvider>
