@@ -77,27 +77,28 @@ export default function Info() {
         </div>
 
         <Image
-          src="/photos/1.jpg"
+          src="/photos/profile.jpg"
           alt="Profile"
           width={120}
           height={120}
+          data-hero="avatar"
           className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 rounded-full border-4 border-neutral-100 dark:border-neutral-900"
         />
       </div>
 
-      <div className="p-4 *:text-center mt-12 space-y-1.5">
+      <div className="p-4 *:text-center mt-12 space-y-1.5" data-hero="text">
         <h1 className="text-xl font-bold">{info.name}</h1>
         <p className="text-sm text-muted-foreground">{info.role}</p>
         <p className="text-sm text-muted-foreground">{info.location}</p>
         <a href={`mailto:${socials.email}`}>
-          <p className="text-xs text-muted-foreground underline hover:text-blue-500">
+          <p className="text-sm text-muted-foreground underline hover:text-blue-500">
             Contact me
           </p>
         </a>
       </div>
 
       <div className="flex items-center justify-center pb-4">
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5" data-hero="icons">
           <InfoActionButton
             tooltip="GitHub"
             ariaLabel="Open GitHub profile"

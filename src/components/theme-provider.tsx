@@ -9,6 +9,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { flushSync } from "react-dom";
 
 export type Theme = "light" | "dark";
 
@@ -46,8 +47,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setTheme = useCallback((theme: Theme) => {
-    setCurrentTheme(theme);
-    applyTheme(theme);
+    const apply = () => {
+      setCurrentTheme(theme);
+      applyTheme(theme);
+    };
+    // Crossfade between themes where the browser supports it (see globals.css).
+    if (!document.startViewTransition) {
+      apply();
+      return;
+    }
+    document.startViewTransition(() => flushSync(apply));
   }, []);
 
   const toggleTheme = useCallback(() => {

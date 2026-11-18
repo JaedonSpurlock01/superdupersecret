@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getAllBlogs } from "@/lib/blog";
 import Section from "./section";
 import { AnimatedTextLink } from "./ui/animated-text-link";
+import { HighlightList } from "./ui/highlight-list";
 
 export default async function Writings() {
   const posts = (await getAllBlogs()).slice(0, 3);
@@ -9,7 +10,7 @@ export default async function Writings() {
   return (
     <Section title="WRITINGS">
       <div className="relative mt-8 space-y-4">
-        <ul className="flex flex-col gap-8">
+        <HighlightList className="flex flex-col gap-8">
           {posts.map((post) => (
             <li key={post.slug}>
               <Link
@@ -18,16 +19,16 @@ export default async function Writings() {
               >
                 <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between md:gap-6">
                   <div className="min-w-0">
-                    <h2 className="text-sm font-semibold leading-tight tracking-tight">
+                    <h2 className="text-base font-semibold leading-6 tracking-tight">
                       <span className="inline-block max-w-full truncate border-b border-transparent transition-colors group-hover:border-foreground">
                         {post.title}
                       </span>
                     </h2>
-                    <p className="mt-1 line-clamp-2 text-xs text-muted-foreground leading-relaxed">
+                    <p className="line-clamp-2 text-base leading-6 text-muted-foreground">
                       {post.summary}
                     </p>
                   </div>
-                  <div className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
+                  <div className="flex shrink-0 items-center gap-1 text-sm leading-6 text-muted-foreground whitespace-nowrap">
                     <time dateTime={post.publishedAt}>
                       {new Date(post.publishedAt).toLocaleDateString("en-US", {
                         month: "short",
@@ -42,9 +43,9 @@ export default async function Writings() {
               </Link>
             </li>
           ))}
-        </ul>
+        </HighlightList>
 
-        <div className="pt-2 text-xs">
+        <div className="pt-2 text-sm">
           <AnimatedTextLink href="/blogs">More writings</AnimatedTextLink>
         </div>
       </div>

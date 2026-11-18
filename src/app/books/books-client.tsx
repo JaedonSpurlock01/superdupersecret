@@ -40,7 +40,7 @@ export function BooksClient({ books }: { books: Book[] }) {
           Books
         </AnimatedTextLink>
 
-        <p className="leading-relaxed text-xs text-neutral-700 dark:text-neutral-300 mt-2">
+        <p className="text-base leading-6 text-neutral-700 dark:text-neutral-300 mt-2">
           These are books I have read, am reading, or want to read. They consist
           of philosophy, software engineering, and historical classics.
         </p>
@@ -117,12 +117,12 @@ export function BooksClient({ books }: { books: Book[] }) {
                           {book.author}
                         </p>
                         {book.summary && (
-                          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                          <p className="mt-2 text-base leading-6 text-muted-foreground">
                             {book.summary}
                           </p>
                         )}
                       </div>
-                      <div className="flex shrink-0 flex-col gap-1 text-xs text-muted-foreground sm:items-end sm:text-right">
+                      <div className="flex shrink-0 flex-col gap-1 text-sm text-muted-foreground sm:items-end sm:text-right">
                         <span className="w-fit rounded-sm border border-border/60 bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-400">
                           {BOOK_STATUS_LABEL[book.status]}
                         </span>

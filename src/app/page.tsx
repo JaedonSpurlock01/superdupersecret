@@ -1,35 +1,45 @@
 import About from "@/components/about";
 import Books from "@/components/books";
-import Education from "@/components/education";
-import Experience from "@/components/experience";
 import Info from "@/components/info";
+import Music from "@/components/music";
 import Projects from "@/components/projects";
-import Skills from "@/components/skills";
-import { StaggerContainer } from "@/components/stagger-container";
+import { RevealStack } from "@/components/reveal-stack";
+import { SectionRail } from "@/components/section-rail";
 import Writings from "@/components/writings";
+import { getFavoriteTracks } from "@/lib/music";
 
-export default function Home() {
+export default async function Home() {
+  const tracks = await getFavoriteTracks();
+
+  const sections = [
+    { id: "about", label: "About", content: <About /> },
+    { id: "projects", label: "Projects", content: <Projects /> },
+    { id: "writings", label: "Writings", content: <Writings /> },
+    { id: "books", label: "Books", content: <Books /> },
+    ...(tracks.length > 0
+      ? [{ id: "music", label: "Music", content: <Music tracks={tracks} /> }]
+      : []),
+  ];
+
   return (
-    <div className="min-h-screen px-4 lg:px-0 grid grid-cols-1 md:grid-cols-5 gap-20 pt-20 pb-20 max-w-4xl mx-auto">
-      <StaggerContainer
-        className="h-fit md:sticky md:top-6 md:col-span-2"
-        delayStep={100}
-      >
-        <Info />
-      </StaggerContainer>
+    <>
+      <div className="min-h-screen px-4 lg:px-0 grid grid-cols-1 md:grid-cols-5 gap-20 pt-20 pb-20 max-w-4xl mx-auto">
+        <div className="hero-card h-fit md:sticky md:top-6 md:col-span-2">
+          <Info />
+        </div>
 
-      <StaggerContainer
-        className="flex flex-col gap-16 md:col-span-3"
-        delayStep={100}
-      >
-        <About />
-        <Education />
-        <Experience />
-        <Projects />
-        <Skills />
-        <Writings />
-        <Books />
-      </StaggerContainer>
-    </div>
+        <RevealStack className="flex flex-col gap-16 md:col-span-3">
+          {sections.map((section) => (
+            <div key={section.id} id={section.id} className="scroll-mt-6">
+              {section.content}
+            </div>
+          ))}
+        </RevealStack>
+      </div>
+
+      <SectionRail
+        sections={sections.map(({ id, label }) => ({ id, label }))}
+      />
+    </>
   );
 }

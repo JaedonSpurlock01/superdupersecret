@@ -1,0 +1,17 @@
+{
+  "tracks": [
+    { "title": "Running in the Night", "artist": "FM-84" },
+    { "title": "Hope", "artist": "Roar" },
+    { "title": "Read My Mind", "artist": "The Killers", "album": "Sam's Town" },
+    {
+      "title": "Humanity",
+      "artist": "Thomas Bergersen",
+      "version": "Humanity (feat. Audrey Callahan)"
+    },
+    { "title": "The Dreamer", "artist": "Tokyo Shoegazer" },
+    { "title": "Bliss", "artist": "Muse", "album": "Origin of Symmetry" },
+    { "title": "On Melancholy Hill", "artist": "Gorillaz" },
+    { "title": "Idle", "artist": "The Music", "album": "Strength in Numbers" },
+    { "title": "Lumina", "artist": "BrunuhVille" }
+  ]
+}

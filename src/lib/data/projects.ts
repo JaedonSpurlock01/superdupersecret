@@ -1,4 +1,48 @@
-export const projects = [
+export type Project = {
+  title: string;
+  description: string;
+  /** Public site. Without one the card isn't a link. */
+  websiteUrl?: string;
+  githubUrl?: string;
+  imageSrc: string;
+  /** Screenshot for dark mode. Falls back to `imageSrc`. */
+  imageSrcDark?: string;
+  /** Logo beside the title, one file per theme (brand colours differ on light and dark). */
+  logo?: { light: string; dark: string };
+  /** One-colour mark in the card's address bar, drawn in the text colour (used as a mask). */
+  faviconSrc?: string;
+  date: string;
+  tags: readonly string[];
+  features?: readonly string[];
+};
+
+export const projects: Project[] = [
+  {
+    title: "Somna",
+    description:
+      "Private, local-first dream journal that does two things well: recording dreams and analyzing them. No AI.",
+    imageSrc: "/projects/somna-light.webp",
+    imageSrcDark: "/projects/somna-dark.webp",
+    logo: {
+      light: "/projects/somna-logo-light.svg",
+      dark: "/projects/somna-logo-dark.svg",
+    },
+    faviconSrc: "/projects/somna-symbol.svg",
+    date: "Nov 2026",
+    tags: [
+      "TypeScript",
+      "React",
+      "SQLite WASM",
+      "Cloudflare Workers",
+      "Protobuf",
+    ],
+    features: [
+      "Record a dream in one action from launch",
+      "Statistics computed from your own data, never guessed by AI",
+      "Works fully offline on one device, with no account",
+      "Optional end-to-end encrypted sync between devices",
+    ],
+  },
   {
     title: "Routify",
     description:
@@ -6,6 +50,11 @@ export const projects = [
     websiteUrl: "https://www.routify.cc",
     githubUrl: "https://www.github.com/jaedonspurlock01/routify",
     imageSrc: "/projects/routify.gif",
+    logo: {
+      light: "/projects/routify-logo-light.svg",
+      dark: "/projects/routify-logo-dark.svg",
+    },
+    faviconSrc: "/projects/routify-symbol.svg",
     date: "Nov 2025",
     tags: [
       "TypeScript",
@@ -22,4 +71,4 @@ export const projects = [
       "Change animation speed realtime",
     ],
   },
-] as const;
+];

@@ -58,6 +58,11 @@ export default async function RootLayout({
             `,
           }}
         />
+        <noscript>
+          <style>
+            {".reveal{opacity:1!important;transform:none!important}"}
+          </style>
+        </noscript>
       </head>
       <body
         className={`${geistMono.variable} antialiased dark:bg-neutral-900 bg-neutral-100 font-sans`}

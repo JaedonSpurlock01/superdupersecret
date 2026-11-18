@@ -12,11 +12,11 @@ export type WorkItem = {
 };
 
 export type AboutContent = {
-  /** Short blurb shown in the ABOUT section on the home page. */
+  /** Short blurb (currently unused on the site). */
   summary: string;
-  /** Paragraphs shown on the /about page. */
+  /** Paragraphs shown in the ABOUT section on the home page. */
   paragraphs: string[];
-  /** Image paths/URLs shown on the /about page. */
+  /** Image paths/URLs for the ABOUT section on the home page. */
   photos: string[];
 };
 

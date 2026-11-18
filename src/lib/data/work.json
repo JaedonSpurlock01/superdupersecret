@@ -4,7 +4,7 @@
     "position": "Software Engineer",
     "location": "Orlando, FL",
     "date": "July 2026 - Present",
-    "imageSrc": "/work/lockheed.jpeg",
+    "imageSrc": "/work/lockheed-star.png",
     "href": "https://www.linkedin.com/company/lockheed-martin/",
     "description": "Building lab automation software to help automate business processes at Rotary & Mission Systems.",
     "skills": ["react", "sveltekit", "postgresql"]
@@ -24,7 +24,7 @@
     "position": "Software Engineer Intern",
     "location": "Remote",
     "date": "Aug 2025 - July 2026",
-    "imageSrc": "/work/lockheed.jpeg",
+    "imageSrc": "/work/lockheed-star.png",
     "href": "https://www.linkedin.com/company/welfie/",
     "description": "Building lab automation software to help automate business processes at Rotary & Mission Systems.",
     "skills": ["react", "sveltekit", "postgresql"]
@@ -34,7 +34,7 @@
     "position": "Software Engineer Intern",
     "location": "Orlando, Florida",
     "date": "May 2025 - Aug 2025",
-    "imageSrc": "/work/lockheed.jpeg",
+    "imageSrc": "/work/lockheed-star.png",
     "href": "https://www.linkedin.com/company/welfie/",
     "description": "Worked with the F-35 Pilot Training Device under Development Environment IPT through build & tools team integrating web development solutions and CI/CD pipelines.",
     "skills": ["react", "sveltekit", "postgresql"]

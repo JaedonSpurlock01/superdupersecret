@@ -21,7 +21,7 @@ export default async function BlogsIndexPage() {
           My Writings
         </AnimatedTextLink>
 
-        <p className="leading-relaxed text-xs text-neutral-700 dark:text-neutral-300 mt-2">
+        <p className="text-base leading-6 text-neutral-700 dark:text-neutral-300 mt-2">
           My writings on software engineering, life, and more
         </p>
       </StaggerContainer>
@@ -42,11 +42,11 @@ export default async function BlogsIndexPage() {
                     <h2 className="truncate text-base font-medium tracking-tight underline-offset-4 group-hover:underline">
                       {post.title}
                     </h2>
-                    <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                    <p className="mt-1 line-clamp-2 text-base leading-6 text-muted-foreground">
                       {post.summary}
                     </p>
                   </div>
-                  <div className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
+                  <div className="flex shrink-0 items-center gap-1 text-sm leading-6 text-muted-foreground whitespace-nowrap">
                     {new Date(post.publishedAt).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
