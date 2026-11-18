@@ -39,7 +39,7 @@ export function BookRows({ books }: { books: Book[] }) {
                     />
                   </div>
                   <div className="min-w-0">
-                    <h2 className="line-clamp-1 text-base font-semibold leading-6 tracking-tight underline decoration-transparent underline-offset-2 transition-colors duration-300 group-hover:decoration-foreground">
+                    <h2 className="line-clamp-1 text-base font-semibold leading-6 tracking-tight">
                       {book.title}
                     </h2>
                     <p className="text-sm text-muted-foreground">

@@ -6,6 +6,7 @@ import { BOOK_COVER_SIZES, useBookSpread } from "@/components/book-spread";
 import { StaggerContainer } from "@/components/stagger-container";
 import { AnimatedTextLink } from "@/components/ui/animated-text-link";
 import { Button } from "@/components/ui/button";
+import { HighlightList } from "@/components/ui/highlight-list";
 import {
   BOOK_STATUS_LABEL,
   type Book,
@@ -96,7 +97,7 @@ export function BooksClient({ books }: { books: Book[] }) {
             No books in this list yet.
           </p>
         ) : (
-          <ul className="flex flex-col gap-10">
+          <HighlightList className="flex flex-col gap-10">
             {visible.map((book) => (
               <li key={book.id}>
                 <article className="group relative flex flex-col gap-4 sm:flex-row sm:gap-6">
@@ -118,7 +119,7 @@ export function BooksClient({ books }: { books: Book[] }) {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                       <div>
-                        <h2 className="line-clamp-2 text-base font-medium tracking-tight underline decoration-transparent underline-offset-2 transition-colors duration-300 group-hover:decoration-foreground">
+                        <h2 className="line-clamp-2 text-base font-medium tracking-tight">
                           {book.title}
                         </h2>
                         <p className="mt-0.5 text-sm text-muted-foreground">
@@ -164,7 +165,7 @@ export function BooksClient({ books }: { books: Book[] }) {
                 </article>
               </li>
             ))}
-          </ul>
+          </HighlightList>
         )}
       </StaggerContainer>
       {spread.dialog}

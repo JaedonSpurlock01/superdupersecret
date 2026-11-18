@@ -19,10 +19,8 @@ export default async function Writings() {
               >
                 <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between md:gap-6">
                   <div className="min-w-0">
-                    <h2 className="text-base font-semibold leading-6 tracking-tight">
-                      <span className="inline-block max-w-full truncate border-b border-transparent transition-colors group-hover:border-foreground">
-                        {post.title}
-                      </span>
+                    <h2 className="truncate text-base font-semibold leading-6 tracking-tight">
+                      {post.title}
                     </h2>
                     <p className="line-clamp-2 text-base leading-6 text-muted-foreground">
                       {post.summary}

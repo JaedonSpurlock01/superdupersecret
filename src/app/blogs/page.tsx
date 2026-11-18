@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { StaggerContainer } from "@/components/stagger-container";
 import { AnimatedTextLink } from "@/components/ui/animated-text-link";
+import { HighlightList } from "@/components/ui/highlight-list";
 import { getAllBlogs } from "@/lib/blog";
 
 export const metadata = {
@@ -30,7 +31,7 @@ export default async function BlogsIndexPage() {
         className="flex flex-col gap-4 md:col-span-3 md:pl-20"
         delayStep={100}
       >
-        <ul className="flex flex-col gap-10">
+        <HighlightList className="flex flex-col gap-10">
           {posts.map((post) => (
             <li key={post.slug}>
               <Link
@@ -39,7 +40,7 @@ export default async function BlogsIndexPage() {
               >
                 <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between md:gap-6">
                   <div className="min-w-0">
-                    <h2 className="truncate text-base font-medium tracking-tight underline-offset-4 group-hover:underline">
+                    <h2 className="truncate text-base font-medium tracking-tight">
                       {post.title}
                     </h2>
                     <p className="mt-1 line-clamp-2 text-base leading-6 text-muted-foreground">
@@ -59,7 +60,7 @@ export default async function BlogsIndexPage() {
               </Link>
             </li>
           ))}
-        </ul>
+        </HighlightList>
       </StaggerContainer>
     </div>
   );
