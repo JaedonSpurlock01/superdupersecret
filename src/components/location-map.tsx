@@ -1,10 +1,10 @@
 "use client";
 
 import maplibregl, { type Map as MapLibreMap } from "maplibre-gl";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { currentLocation } from "@/lib/data/location";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Badge } from "@/components/ui/badge";
+import { WeatherBadge } from "./orlando-now";
 import { useTheme } from "./theme-provider";
 
 const LIGHT_MAP_STYLE =
@@ -29,35 +29,8 @@ export function LocationMap() {
   const mapRef = useRef<MapLibreMap | null>(null);
   const compassDblClickCleanupRef = useRef<(() => void) | null>(null);
   const appliedStyleRef = useRef<string | null>(null);
-  const [timeString, setTimeString] = useState<string>("");
   const { currentTheme } = useTheme();
   const isDark = currentTheme === "dark";
-
-  useEffect(() => {
-    const formatter = new Intl.DateTimeFormat(undefined, {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-      timeZone: currentLocation.timezone,
-    });
-
-    const updateTime = () => {
-      try {
-        setTimeString(formatter.format(new Date()));
-      } catch {
-        // If timezone is invalid for any reason, fall back to local time.
-        setTimeString(new Date().toLocaleTimeString());
-      }
-    };
-
-    updateTime();
-    const interval = window.setInterval(updateTime, 1000);
-
-    return () => {
-      window.clearInterval(interval);
-    };
-  }, []);
 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
@@ -169,16 +142,9 @@ export function LocationMap() {
         className={`relative h-full w-full ${isDark ? "map-dark" : ""}`}
       />
 
-      {timeString && (
-        <div className="pointer-events-none absolute left-3 top-3 z-10">
-          <Badge
-            variant="secondary"
-            className="pointer-events-auto text-xs text-foreground shadow-sm ring-1 ring-border/60 backdrop-blur border border-border/40 rounded-sm"
-          >
-            Local time · {timeString}
-          </Badge>
-        </div>
-      )}
+      <div className="pointer-events-none absolute left-3 top-3 z-10">
+        <WeatherBadge />
+      </div>
     </div>
   );
 }

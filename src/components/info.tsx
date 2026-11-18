@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 import { info, socials } from "@/lib/data/personal";
 import { LocationMap } from "./location-map";
+import { LocalStatus } from "./orlando-now";
 import Section from "./section";
 import { useTheme } from "./theme-provider";
 import { Button } from "./ui/button";
@@ -90,6 +91,7 @@ export default function Info() {
         <h1 className="text-xl font-bold">{info.name}</h1>
         <p className="text-sm text-muted-foreground">{info.role}</p>
         <p className="text-sm text-muted-foreground">{info.location}</p>
+        <LocalStatus className="text-xs text-muted-foreground/80 text-balance" />
         <a href={`mailto:${socials.email}`}>
           <p className="text-sm text-muted-foreground underline hover:text-blue-500">
             Contact me
