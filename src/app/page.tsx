@@ -1,5 +1,6 @@
 import About from "@/components/about";
 import Books from "@/components/books";
+import Climbing from "@/components/climbing";
 import Info from "@/components/info";
 import Music from "@/components/music";
 import Projects from "@/components/projects";
@@ -19,6 +20,7 @@ export default async function Home() {
     ...(tracks.length > 0
       ? [{ id: "music", label: "Music", content: <Music tracks={tracks} /> }]
       : []),
+    { id: "climbing", label: "Climbing", content: <Climbing /> },
   ];
 
   return (

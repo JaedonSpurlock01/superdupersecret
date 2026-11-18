@@ -434,7 +434,8 @@ html[data-book-flight="close"]::view-transition-group(.book-flight) {
 /* The music covers are always named; left alone they'd be lifted out of the
    page snapshot and sit bright on top of the dimming backdrop. */
 html[data-book-flight] .music-cover,
-html[data-about-photo] .music-cover {
+html[data-about-photo] .music-cover,
+html[data-climb-flight] .music-cover {
   view-transition-name: none !important;
 }
 
@@ -460,7 +461,8 @@ html[data-about-photo] .music-cover {
 }
 
 .book-dialog,
-.about-photo-dialog {
+.about-photo-dialog,
+.climb-dialog {
   position: fixed;
   inset: 0;
   width: 100vw;
@@ -477,8 +479,232 @@ html[data-about-photo] .music-cover {
 }
 
 .book-dialog::backdrop,
-.about-photo-dialog::backdrop {
+.about-photo-dialog::backdrop,
+.climb-dialog::backdrop {
   background: transparent;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Climbing: the logbook as a rope (see ClimbRope), and the dialog a row opens
+   into (see ClimbDialog). */
+
+:root {
+  /* Sandstone. The one colour the climbing section adds. */
+  --climb-accent: oklch(0.64 0.17 42);
+  /* The page colour (body is neutral-100 / neutral-900, not --background),
+     for knocking shapes out of the rope drawn behind them. */
+  --climb-paper: oklch(0.97 0 0);
+}
+
+.dark {
+  --climb-accent: oklch(0.76 0.14 55);
+  --climb-paper: oklch(0.205 0 0);
+}
+
+/* The rope pays out from the belayer up, the first time it is seen. */
+.climb-rope-line {
+  opacity: 0.8;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1400ms var(--ease-in-out);
+}
+
+.climb-rope[data-seen="true"] .climb-rope-line {
+  stroke-dashoffset: 0;
+}
+
+.climb-rope-weave {
+  opacity: 0;
+  transition: opacity 400ms ease 1250ms;
+}
+
+.climb-rope[data-seen="true"] .climb-rope-weave {
+  opacity: 1;
+}
+
+/* Each bolt wakes as the rope reaches it (--clip-delay, set per bolt). */
+.climb-bolt {
+  color: var(--muted-foreground);
+  opacity: 0.25;
+  scale: 0.85;
+  transition:
+    opacity 250ms var(--ease-out) var(--clip-delay, 0ms),
+    scale 250ms var(--ease-out) var(--clip-delay, 0ms),
+    color 150ms ease;
+}
+
+.climb-rope[data-seen="true"] .climb-bolt {
+  opacity: 1;
+  scale: 1;
+}
+
+/* Rows the list hasn't opened far enough to reach yet. */
+.climb-rope[data-seen] .climb-bolt[data-off="true"] {
+  opacity: 0;
+  transition-delay: 0ms;
+}
+
+.climb-bolt[data-hot="true"] {
+  color: var(--climb-accent);
+}
+
+/* The belayer is there from the start; the leader shows up with the rope. */
+.climb-figure {
+  color: var(--foreground);
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+.climb-figure-lead {
+  transition-delay: 1250ms;
+}
+
+.climb-rope[data-seen="true"] .climb-figure {
+  opacity: 0.85;
+}
+
+/* A row flies into its dialog. */
+.climb-flight {
+  view-transition-class: climb-flight;
+}
+
+::view-transition-group(.climb-flight) {
+  animation-duration: 480ms;
+  animation-timing-function: var(--ease-drawer);
+}
+
+html[data-climb-flight="close"]::view-transition-group(.climb-flight) {
+  animation-duration: 360ms;
+}
+
+/* Row and dialog have very different shapes, so neither snapshot is ever
+   scaled: both stay at their own size, pinned to the moving box's top-left
+   corner, and the box clips them. The card is uncovered as the box grows out
+   of the row, and the row's text just fades where it stood. */
+::view-transition-group(.climb-flight) {
+  overflow: clip;
+  border-radius: calc(var(--radius) * 1.4);
+}
+
+::view-transition-old(.climb-flight),
+::view-transition-new(.climb-flight) {
+  width: auto;
+  height: auto;
+  max-width: none;
+  object-fit: none;
+  object-position: top left;
+  mix-blend-mode: normal;
+}
+
+html[data-climb-flight="open"]::view-transition-old(.climb-flight) {
+  animation: climb-fade-out 140ms var(--ease-out) both;
+}
+
+html[data-climb-flight="open"]::view-transition-new(.climb-flight) {
+  animation: fade-in 200ms ease both;
+}
+
+/* Closing: the card fades as the box shrinks, then the row is back. */
+html[data-climb-flight="close"]::view-transition-old(.climb-flight) {
+  animation: climb-fade-out 220ms var(--ease-out) both;
+}
+
+html[data-climb-flight="close"]::view-transition-new(.climb-flight) {
+  animation: fade-in 180ms ease 180ms both;
+}
+
+.climb-chrome {
+  view-transition-class: climb-chrome;
+}
+
+@keyframes climb-settle {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes climb-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+::view-transition-new(.climb-chrome) {
+  animation: climb-settle 300ms var(--ease-out) 200ms both;
+}
+
+::view-transition-old(.climb-chrome) {
+  animation: climb-fade-out 120ms var(--ease-out) both;
+}
+
+/* Notes and the link settle in once the flight is under way. */
+.climb-settle {
+  animation: climb-settle 320ms var(--ease-out) 220ms both;
+}
+
+.climb-photos {
+  scrollbar-width: none;
+  scroll-padding-inline: 0.75rem;
+  cursor: grab;
+}
+
+.climb-photos::-webkit-scrollbar {
+  display: none;
+}
+
+.climb-photos[data-dragging="true"] {
+  cursor: grabbing;
+  /* Snapping would fight the hand while it drags. */
+  scroll-snap-type: none;
+}
+
+/* The last photo can scroll clear of the edge. */
+.climb-photos::after {
+  content: "";
+  flex: 0 0 0.25rem;
+}
+
+/* Arrows over the strip, only while there is more that way. */
+.climb-photos-arrow {
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 150ms ease,
+    background-color 150ms ease,
+    scale 150ms var(--ease-out);
+}
+
+.climb-photos-arrow[data-on="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.climb-photos-arrow:active {
+  scale: 0.94;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .climb-rope-line {
+    stroke-dashoffset: 0;
+    transition: none;
+  }
+
+  .climb-rope-weave,
+  .climb-figure-lead {
+    transition-delay: 0ms;
+  }
+
+  .climb-bolt {
+    scale: 1;
+    transition:
+      opacity 250ms ease,
+      color 150ms ease;
+  }
+
+  .climb-settle {
+    animation-name: fade-in;
+  }
 }
 
 .book-stage {
