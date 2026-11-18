@@ -343,6 +343,77 @@
   }
 }
 
+/* About photos: a word's hover thumbnail flies into a dialog
+   (see AboutPhotoWord). The frame and the photo are separate groups on one
+   clock, so the photo stays put inside whatever surrounds it. */
+.about-photo-frame {
+  view-transition-class: about-photo-frame;
+}
+
+.about-photo {
+  view-transition-class: about-photo;
+}
+
+::view-transition-group(.about-photo-frame),
+::view-transition-group(.about-photo) {
+  animation-duration: 500ms;
+  animation-timing-function: var(--ease-drawer);
+}
+
+html[data-about-photo="close"]::view-transition-group(.about-photo-frame),
+html[data-about-photo="close"]::view-transition-group(.about-photo) {
+  animation-duration: 380ms;
+}
+
+/* The frame changes shape between thumbnail and dialog: stretch both ends to
+   the moving box and let them crossfade. */
+::view-transition-old(.about-photo-frame),
+::view-transition-new(.about-photo-frame) {
+  height: 100%;
+  object-fit: fill;
+}
+
+/* The photo doesn't crossfade. Only the dialog's copy is shown, both ways:
+   it is the sharp one, and two blended copies would ghost. */
+::view-transition-old(.about-photo),
+::view-transition-new(.about-photo) {
+  height: 100%;
+  object-fit: cover;
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html[data-about-photo="open"]::view-transition-old(.about-photo),
+html[data-about-photo="close"]::view-transition-new(.about-photo) {
+  display: none;
+}
+
+/* Caption and close button settle in once the photo is most of the way. */
+.about-photo-chrome {
+  view-transition-class: about-photo-chrome;
+}
+
+@keyframes about-photo-chrome-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes about-photo-chrome-out {
+  to {
+    opacity: 0;
+  }
+}
+
+::view-transition-new(.about-photo-chrome) {
+  animation: about-photo-chrome-in 300ms var(--ease-out) 200ms both;
+}
+
+::view-transition-old(.about-photo-chrome) {
+  animation: about-photo-chrome-out 120ms var(--ease-out) both;
+}
+
 /* Books: a row's cover flies into a dialog and opens into a 3D spread
    (see BookSpread). */
 .book-flight {
@@ -360,7 +431,8 @@ html[data-book-flight="close"]::view-transition-group(.book-flight) {
 
 /* The music covers are always named; left alone they'd be lifted out of the
    page snapshot and sit bright on top of the dimming backdrop. */
-html[data-book-flight] .music-cover {
+html[data-book-flight] .music-cover,
+html[data-about-photo] .music-cover {
   view-transition-name: none !important;
 }
 
@@ -385,7 +457,8 @@ html[data-book-flight] .music-cover {
   animation: book-controls-out 160ms var(--ease-out) both;
 }
 
-.book-dialog {
+.book-dialog,
+.about-photo-dialog {
   position: fixed;
   inset: 0;
   width: 100vw;
@@ -401,7 +474,8 @@ html[data-book-flight] .music-cover {
   overscroll-behavior: contain;
 }
 
-.book-dialog::backdrop {
+.book-dialog::backdrop,
+.about-photo-dialog::backdrop {
   background: transparent;
 }
 

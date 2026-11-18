@@ -1,17 +1,43 @@
-import Image from "next/image";
 import aboutJson from "@/lib/data/about.json";
+import { type AboutPhoto, AboutPhotoWord } from "./about-photo";
 import { InlineCompany } from "./inline-company";
 import Section from "./section";
 
 /**
- * Words in the About copy that reveal a photo on hover, focus or tap.
- * Keep these in sync with the text in about.json.
+ * Words in the About copy that reveal a photo on hover or focus, and open it
+ * on click. Keep these in sync with the text in about.json.
+ *
+ * TODO: fill in the bracketed places and dates.
  */
-const WORD_PHOTOS: Record<string, string> = {
-  "rock climbing": "/photos/climbing.jpg",
-  skiing: "/photos/skiing.jpg",
-  hiking: "/photos/hiking.jpg",
-  traveling: "/photos/travel.jpg",
+const WORD_PHOTOS: Record<string, AboutPhoto> = {
+  "rock climbing": {
+    src: "/photos/climbing.jpg",
+    alt: "Lead climbing a sunlit rock spire against a deep blue sky",
+    caption: "Leading a sun-baked spire.",
+    place: "[where?]",
+    date: "[when?]",
+  },
+  skiing: {
+    src: "/photos/skiing.jpg",
+    alt: "Standing on skis beside the Mammoth Mountain summit sign",
+    caption: "Top of the mountain, Sierra peaks behind.",
+    place: "Mammoth Mountain, CA",
+    date: "[when?]",
+  },
+  hiking: {
+    src: "/photos/hiking.jpg",
+    alt: "Two hikers holding the Mt. Whitney 14,505 ft summit sign",
+    caption: "Summit of Mt. Whitney, 14,505 ft.",
+    place: "Mt. Whitney, CA",
+    date: "[when?]",
+  },
+  traveling: {
+    src: "/photos/travel.jpg",
+    alt: "On a boat at night with a lit-up city skyline behind",
+    caption: "City lights from the water at night.",
+    place: "[where?]",
+    date: "[when?]",
+  },
 };
 
 const wordPattern = new RegExp(`(${Object.keys(WORD_PHOTOS).join("|")})`, "g");
@@ -19,24 +45,8 @@ const wordPattern = new RegExp(`(${Object.keys(WORD_PHOTOS).join("|")})`, "g");
 function withHoverPhotos(text: string) {
   return text.split(wordPattern).map((part, i) =>
     WORD_PHOTOS[part] ? (
-      <span
-        // biome-ignore lint/suspicious/noArrayIndexKey: static split of static text
-        key={i}
-        // biome-ignore lint/a11y/noNoninteractiveTabindex: focus reveals the photo for touch and keyboard
-        tabIndex={0}
-        className="group relative cursor-default text-foreground underline decoration-neutral-400 decoration-dotted underline-offset-4 outline-none transition-colors duration-200 hover:decoration-foreground focus-visible:decoration-foreground"
-      >
-        {part}
-        <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 block size-36 origin-bottom -translate-x-1/2 translate-y-1 -rotate-3 scale-90 overflow-hidden rounded-md border-2 border-neutral-100 bg-muted opacity-0 shadow-md transition-[opacity,scale,translate] duration-200 ease-(--ease-out) group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus:translate-y-0 group-focus:scale-100 group-focus:opacity-100 motion-reduce:transition-[opacity] dark:border-neutral-900">
-          <Image
-            src={WORD_PHOTOS[part]}
-            alt={part}
-            fill
-            sizes="144px"
-            className="object-cover"
-          />
-        </span>
-      </span>
+      // biome-ignore lint/suspicious/noArrayIndexKey: static split of static text
+      <AboutPhotoWord key={i} word={part} photo={WORD_PHOTOS[part]} />
     ) : (
       part
     ),
