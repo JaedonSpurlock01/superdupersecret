@@ -1,35 +1,22 @@
 import { NextResponse } from "next/server";
 import { isValidGuestbookDotId } from "@/lib/guestbook/dots";
-import type {
-  GuestbookEntryJson,
-  GuestbookListJson,
+import { GUESTBOOK_LIST_MAX, toGuestbookJson } from "@/lib/guestbook/entries";
+import {
+  GUESTBOOK_MESSAGE_MAX,
+  GUESTBOOK_NAME_MAX,
+  type GuestbookEntryJson,
+  type GuestbookListJson,
 } from "@/lib/guestbook/types";
 import { getPrismaClient } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
-const NAME_MAX = 80;
-const MESSAGE_MAX = 8_000;
+const NAME_MAX = GUESTBOOK_NAME_MAX;
+const MESSAGE_MAX = GUESTBOOK_MESSAGE_MAX;
 const DEVICE_ID_MIN = 8;
 const DEVICE_ID_MAX = 128;
-/** Cap list size to bound read cost and payload size (adjust if you need more). */
-const LIST_MAX = 2000;
-
-function toJson(row: {
-  id: string;
-  dotId: string;
-  name: string;
-  message: string;
-  createdAt: Date;
-}): GuestbookEntryJson {
-  return {
-    id: row.id,
-    dotId: row.dotId,
-    name: row.name,
-    message: row.message,
-    createdAt: row.createdAt.toISOString(),
-  };
-}
+const LIST_MAX = GUESTBOOK_LIST_MAX;
+const toJson = toGuestbookJson;
 
 function isValidDeviceId(id: string): boolean {
   if (id.length < DEVICE_ID_MIN || id.length > DEVICE_ID_MAX) return false;

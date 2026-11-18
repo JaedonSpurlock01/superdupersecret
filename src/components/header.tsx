@@ -37,7 +37,7 @@ export default function PageHeader() {
             </Button>
           </Link>
           {databaseAvailable && (
-            <Link href="/guestbook">
+            <Link href="/#guestbook">
               <Button variant="ghost" size="lg">
                 <HugeiconsIcon icon={UserGroupIcon} /> Guestbook
               </Button>

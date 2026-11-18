@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
 import { getAllBlogs } from "@/lib/blog";
-import { isDatabaseAvailable } from "@/lib/database-availability";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://jaedonspurlock.com";
@@ -8,10 +7,7 @@ const siteUrl =
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [posts, databaseAvailable] = await Promise.all([
-    getAllBlogs(),
-    isDatabaseAvailable(),
-  ]);
+  const posts = await getAllBlogs();
 
   const staticBase = [
     "",
@@ -21,10 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/spurlock-labs/privacy",
     "/spurlock-labs/terms",
   ];
-  const staticRoutes = [
-    ...staticBase,
-    ...(databaseAvailable ? ["/guestbook"] : []),
-  ].map((route) => ({
+  const staticRoutes = staticBase.map((route) => ({
     url: `${siteUrl}${route}`,
     lastModified: new Date().toISOString(),
   }));

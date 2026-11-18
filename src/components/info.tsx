@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useDatabaseFeatures } from "@/components/database-features-provider";
 import {
   Tooltip,
   TooltipContent,
@@ -65,7 +64,6 @@ export function InfoActionButton({
 
 export default function Info() {
   const { currentTheme, toggleTheme, toggleSpace } = useTheme();
-  const { databaseAvailable } = useDatabaseFeatures();
   const isDark = currentTheme === "dark";
 
   return (
@@ -176,24 +174,6 @@ export default function Info() {
                             </svg>
                         }
                     /> */}
-
-          {databaseAvailable && (
-            <InfoActionButton
-              tooltip="Guestbook"
-              ariaLabel="Open guestbook"
-              href="/guestbook"
-              icon={
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  className="size-4 fill-current"
-                >
-                  <title>Guestbook</title>
-                  <path d="M16 11a3 3 0 1 0-2.999-3A3 3 0 0 0 16 11zm-8 0a3 3 0 1 0-2.999-3A3 3 0 0 0 8 11zm0 2c-2.673 0-8 1.343-8 4v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1c0-2.657-5.327-4-8-4zm8 0c-.299 0-.627.018-.973.051C16.68 13.89 18 15.205 18 17v1c0 .35-.07.683-.196.987l4.196.013a2 2 0 0 0 2-2v-1c0-2.657-5.327-4-8-4z" />
-                </svg>
-              }
-            />
-          )}
 
           <InfoActionButton
             tooltip={isDark ? "Light mode" : "Dark mode"}

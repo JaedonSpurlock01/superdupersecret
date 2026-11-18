@@ -1311,3 +1311,174 @@ html.space-mode .hero-card > section {
     display: none;
   }
 }
+
+/* ------------------------------------------------------------------------ */
+/* Guestbook: notes as a deck of postcards over a dot map (see GuestbookDeck). */
+
+:root {
+  /* Airmail blue. The one colour the guestbook adds: visitors and routes. */
+  --gb-accent: oklch(0.6 0.19 259);
+}
+
+.dark {
+  --gb-accent: oklch(0.74 0.14 250);
+}
+
+/* A card's place in the deck is its inline transform; moving up the deck,
+   settling after a drag and leaving all ride this one transition. The
+   individual translate/rotate properties are left free for entrances. */
+.gb-card {
+  transition:
+    transform 350ms var(--ease-out),
+    translate 350ms var(--ease-out),
+    rotate 350ms var(--ease-out),
+    opacity 250ms ease;
+  touch-action: pan-y;
+}
+
+/* Under the finger the card is the finger: no easing in between. */
+.gb-card[data-dragging="true"] {
+  transition: none;
+}
+
+/* The blank card comes down onto the deck. */
+@starting-style {
+  .gb-card-blank {
+    opacity: 0;
+    translate: 0 -18px;
+    rotate: -4deg;
+  }
+}
+
+/* A card fetched from out of sight comes back the way cards leave. */
+@starting-style {
+  .gb-card[data-arriving="true"] {
+    opacity: 0;
+    translate: -115% 0;
+    rotate: -12deg;
+  }
+}
+
+/* Perforated edge: card-coloured holes punched along a tinted border. */
+.gb-stamp {
+  padding: 4px;
+  background:
+    radial-gradient(circle at 3px 3px, var(--card) 1.6px, transparent 1.8px)
+    -3px -3px / 6px 6px,
+    color-mix(in oklab, var(--foreground) 8%, var(--card));
+}
+
+.gb-land {
+  fill: color-mix(in oklab, var(--foreground) 17%, transparent);
+}
+
+.gb-home {
+  fill: var(--foreground);
+}
+
+/* Visitors' dots wake one after another the first time the map is seen
+   (--d, set per dot). */
+.gb-pin {
+  fill: var(--gb-accent);
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  scale: 0.5;
+  transition:
+    opacity 300ms var(--ease-out) var(--d, 0ms),
+    scale 300ms var(--ease-out) var(--d, 0ms);
+}
+
+[data-seen="true"] .gb-pin {
+  opacity: 1;
+  scale: 1;
+}
+
+/* The dot whose card is on top. */
+[data-seen="true"] .gb-pin[data-top="true"] {
+  scale: 1.5;
+  transition-delay: 0ms;
+  transition-duration: 150ms;
+}
+
+/* While the visitor is placing their own pin, everyone else steps back. */
+[data-seen="true"] .gb-pin[data-dim="true"] {
+  opacity: 0.35;
+  transition-delay: 0ms;
+}
+
+.gb-route {
+  fill: none;
+  stroke: color-mix(in oklab, var(--foreground) 14%, transparent);
+  stroke-width: 0.16;
+}
+
+/* The top card's route draws itself from its dot to Orlando. */
+.gb-route-top {
+  fill: none;
+  stroke: var(--gb-accent);
+  stroke-width: 0.3;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 600ms var(--ease-out);
+}
+
+@starting-style {
+  .gb-route-top {
+    stroke-dashoffset: 1;
+  }
+}
+
+/* The visitor's own pin glides between spots while they are choosing. */
+.gb-you {
+  transition: transform 300ms var(--ease-in-out);
+  pointer-events: none;
+}
+
+.gb-you-drop {
+  transition:
+    opacity 250ms var(--ease-out),
+    transform 250ms var(--ease-out);
+}
+
+@starting-style {
+  .gb-you-drop {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+}
+
+.gb-you-ring {
+  fill: color-mix(in oklab, var(--gb-accent) 18%, transparent);
+  stroke: var(--gb-accent);
+  stroke-width: 0.25;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Cards swap with a fade; nothing travels. */
+  .gb-card {
+    transition: opacity 200ms ease;
+  }
+
+  .gb-pin {
+    scale: 1;
+  }
+
+  .gb-route-top,
+  .gb-you {
+    transition: none;
+  }
+
+  @starting-style {
+    .gb-card-blank,
+    .gb-card[data-arriving="true"] {
+      translate: none;
+      rotate: none;
+    }
+
+    .gb-you-drop {
+      transform: none;
+    }
+  }
+}
