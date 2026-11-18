@@ -223,7 +223,9 @@ export function ClimbRope({ climbs }: { climbs: Climb[] }) {
   };
 
   return (
-    <div className="mt-8">
+    // Framed like the project cards. Shapes knock out of the rope in the
+    // card's colour, not the page's.
+    <div className="mt-8 rounded-md border border-border bg-card p-5 [--climb-paper:var(--card)]">
       {/* Grade axis. */}
       <div aria-hidden="true" className="relative h-5">
         {AXIS.map((grade) => (
