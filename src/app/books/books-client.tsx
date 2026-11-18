@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
+import { BOOK_COVER_SIZES, useBookSpread } from "@/components/book-spread";
 import { StaggerContainer } from "@/components/stagger-container";
 import { AnimatedTextLink } from "@/components/ui/animated-text-link";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ export function BooksClient({ books }: { books: Book[] }) {
     if (filter === "all") return books;
     return books.filter((b) => b.status === filter);
   }, [books, filter]);
+  const spread = useBookSpread(books);
 
   return (
     <div className="min-h-screen px-4 lg:px-0 grid grid-cols-1 md:grid-cols-5 gap-20 pt-20 pb-20 max-w-4xl mx-auto">
@@ -97,13 +99,19 @@ export function BooksClient({ books }: { books: Book[] }) {
           <ul className="flex flex-col gap-10">
             {visible.map((book) => (
               <li key={book.id}>
-                <article className="group flex flex-col gap-4 sm:flex-row sm:gap-6">
-                  <div className="relative mx-auto h-40 w-[calc(10rem*2/3)] shrink-0 overflow-hidden rounded-md bg-muted ring-1 ring-border/60 sm:mx-0">
+                <article className="group relative flex flex-col gap-4 sm:flex-row sm:gap-6">
+                  <div
+                    className={cn(
+                      "relative mx-auto h-40 w-[calc(10rem*2/3)] shrink-0 overflow-hidden rounded-md bg-muted ring-1 ring-border/60 sm:mx-0",
+                      spread.coverProps(book.id).className,
+                    )}
+                    style={spread.coverProps(book.id).style}
+                  >
                     <Image
                       src={book.image}
                       alt={`Cover: ${book.title}`}
                       fill
-                      sizes="107px"
+                      sizes={BOOK_COVER_SIZES}
                       className="object-cover transition duration-300 group-hover:scale-[1.02]"
                     />
                   </div>
@@ -144,12 +152,22 @@ export function BooksClient({ books }: { books: Book[] }) {
                       </div>
                     </div>
                   </div>
+                  <button
+                    type="button"
+                    aria-haspopup="dialog"
+                    aria-label={`Open ${book.title}`}
+                    className="absolute -inset-2 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-ring"
+                    onClick={(event) =>
+                      spread.open(book.id, event.currentTarget)
+                    }
+                  />
                 </article>
               </li>
             ))}
           </ul>
         )}
       </StaggerContainer>
+      {spread.dialog}
     </div>
   );
 }

@@ -162,6 +162,8 @@
 :root {
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-pop: cubic-bezier(0.34, 1.45, 0.64, 1);
+  /* iOS-like sheet curve: long travel that starts fast and settles softly. */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 /* Projects carousel: the active dot fills over the 5s interval. Its
@@ -339,6 +341,221 @@
   .music-spin {
     animation: none;
   }
+}
+
+/* Books: a row's cover flies into a dialog and opens into a 3D spread
+   (see BookSpread). */
+.book-flight {
+  view-transition-class: book-flight;
+}
+
+::view-transition-group(.book-flight) {
+  animation-duration: 520ms;
+  animation-timing-function: var(--ease-drawer);
+}
+
+html[data-book-flight="close"]::view-transition-group(.book-flight) {
+  animation-duration: 380ms;
+}
+
+/* The music covers are always named; left alone they'd be lifted out of the
+   page snapshot and sit bright on top of the dimming backdrop. */
+html[data-book-flight] .music-cover {
+  view-transition-name: none !important;
+}
+
+@keyframes book-controls-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes book-controls-out {
+  to {
+    opacity: 0;
+  }
+}
+
+::view-transition-new(book-controls) {
+  animation: book-controls-in 380ms var(--ease-out) 120ms both;
+}
+
+::view-transition-old(book-controls) {
+  animation: book-controls-out 160ms var(--ease-out) both;
+}
+
+.book-dialog {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.book-dialog::backdrop {
+  background: transparent;
+}
+
+.book-stage {
+  --book-d: 12px;
+  --book-paper: #f6f2e9;
+  --book-ink: #1c1917;
+  position: relative;
+  flex-shrink: 0;
+  width: var(--book-w);
+  height: calc(var(--book-w) * 1.5);
+  perspective: 1400px;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.book-stage:active {
+  cursor: grabbing;
+}
+
+/* Tilts about the spine, which is the middle of the open spread. */
+.book-body {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform-origin: 0% 50% calc(var(--book-d) / -2);
+  will-change: transform;
+}
+
+.book-back {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(calc(var(--book-d) * -1));
+  border-radius: 2px 4px 4px 2px;
+  background: var(--book-color);
+  box-shadow: 0 18px 36px -12px rgb(0 0 0 / 0.55);
+}
+
+.book-spine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--book-d);
+  height: 100%;
+  transform-origin: right center;
+  transform: translateX(-100%) rotateY(-90deg);
+  background: var(--book-color);
+}
+
+/* Page block edges: fore-edge, head and tail. */
+.book-edge {
+  position: absolute;
+  background: repeating-linear-gradient(
+    var(--book-edge-dir, 90deg),
+    #f4f0e6 0 1px,
+    #d8d3c6 1px 2px
+  );
+}
+
+.book-edge-fore {
+  top: 3px;
+  bottom: 3px;
+  left: calc(100% - 3px);
+  width: var(--book-d);
+  transform-origin: left center;
+  transform: rotateY(90deg);
+}
+
+.book-edge-head {
+  --book-edge-dir: 0deg;
+  top: 3px;
+  left: 0;
+  right: 3px;
+  height: var(--book-d);
+  transform-origin: center top;
+  transform: rotateX(-90deg);
+}
+
+.book-edge-tail {
+  --book-edge-dir: 0deg;
+  bottom: 3px;
+  left: 0;
+  right: 3px;
+  height: var(--book-d);
+  transform-origin: center bottom;
+  transform: rotateX(90deg);
+}
+
+/* Type on the pages scales with the book, down to phone widths. */
+.book-page-text {
+  font-size: clamp(9px, 2.5vw, 13px);
+  color: var(--book-ink);
+}
+
+/* Right-hand page, revealed when the cover opens. */
+.book-page {
+  position: absolute;
+  inset: 3px 3px 3px 0;
+  transform: translateZ(-1px);
+  overflow: hidden;
+  border-radius: 0 2px 2px 0;
+  background: var(--book-paper);
+}
+
+.book-page::before {
+  /* Gutter shadow by the spine. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.16), transparent 12%);
+  pointer-events: none;
+}
+
+.book-page-shade {
+  /* Shadow the cover casts on the page; fades as the cover opens. */
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0.15));
+  pointer-events: none;
+}
+
+.book-cover {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.book-cover-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 2px 4px 4px 2px;
+  background: var(--book-color);
+}
+
+/* Left-hand page: the inside of the cover. */
+.book-cover-inside {
+  transform: rotateY(180deg);
+  border-radius: 4px 2px 2px 4px;
+  background: var(--book-paper);
+}
+
+.book-cover-inside::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(270deg, rgb(0 0 0 / 0.16), transparent 12%);
+  pointer-events: none;
 }
 
 @keyframes fade-in-up {
