@@ -162,7 +162,7 @@ export function BlogEditor({ initial }: { initial: AdminBlogListItem[] }) {
               >
                 <p className="truncate text-sm font-medium">{post.title}</p>
                 <p className="truncate text-xs text-muted-foreground">
-                  /blogs/{post.slug} ·{" "}
+                  /?post={post.slug} ·{" "}
                   {new Date(post.publishedAt).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
@@ -211,7 +211,7 @@ export function BlogEditor({ initial }: { initial: AdminBlogListItem[] }) {
         </Button>
         {!isNew && (
           <a
-            href={`/blogs/${editing}`}
+            href={`/?post=${encodeURIComponent(editing)}`}
             target="_blank"
             rel="noreferrer"
             className="text-xs text-muted-foreground hover:underline"
@@ -238,7 +238,7 @@ export function BlogEditor({ initial }: { initial: AdminBlogListItem[] }) {
           value={draft.slug}
           hint={
             isNew
-              ? "URL: /blogs/<slug>"
+              ? "URL: /?post=<slug>"
               : "Changing this renames the file (old URL and its comments/views won't follow)."
           }
           onChange={(slug) => set({ slug: slugify(slug) })}

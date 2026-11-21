@@ -31,7 +31,7 @@ export default function PageHeader() {
           />
         </Link>
         <div className="flex items-center gap-2">
-          <Link href="/blogs">
+          <Link href="/#writings">
             <Button variant="ghost" size="lg">
               <HugeiconsIcon icon={LicenseDraftIcon} /> Blog
             </Button>

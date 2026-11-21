@@ -435,7 +435,8 @@ html[data-book-flight="close"]::view-transition-group(.book-flight) {
    page snapshot and sit bright on top of the dimming backdrop. */
 html[data-book-flight] .music-cover,
 html[data-about-photo] .music-cover,
-html[data-climb-flight] .music-cover {
+html[data-climb-flight] .music-cover,
+html[data-blog-flight] .music-cover {
   view-transition-name: none !important;
 }
 
@@ -462,7 +463,8 @@ html[data-climb-flight] .music-cover {
 
 .book-dialog,
 .about-photo-dialog,
-.climb-dialog {
+.climb-dialog,
+.blog-dialog {
   position: fixed;
   inset: 0;
   width: 100vw;
@@ -480,7 +482,8 @@ html[data-climb-flight] .music-cover {
 
 .book-dialog::backdrop,
 .about-photo-dialog::backdrop,
-.climb-dialog::backdrop {
+.climb-dialog::backdrop,
+.blog-dialog::backdrop {
   background: transparent;
 }
 
@@ -705,6 +708,58 @@ html[data-climb-flight="close"]::view-transition-new(.climb-flight) {
   .climb-settle {
     animation-name: fade-in;
   }
+}
+
+/* ------------------------------------------------------------------------ */
+/* Blog dialog: a Writings row grows into a reading card (see
+   blog-dialog.tsx). */
+.blog-flight {
+  view-transition-class: blog-flight;
+}
+
+::view-transition-group(.blog-flight) {
+  animation-duration: 480ms;
+  animation-timing-function: var(--ease-drawer);
+}
+
+html[data-blog-flight="close"]::view-transition-group(.blog-flight) {
+  animation-duration: 360ms;
+}
+
+/* Row and card have very different shapes, so neither snapshot is scaled:
+   each stays its own size, pinned to the moving box's top-left corner, and
+   the box clips them. The card is uncovered as the box grows out of the row,
+   and the row's text fades where it stood. */
+::view-transition-group(.blog-flight) {
+  overflow: clip;
+  border-radius: calc(var(--radius) * 1.4);
+}
+
+::view-transition-old(.blog-flight),
+::view-transition-new(.blog-flight) {
+  width: auto;
+  height: auto;
+  max-width: none;
+  object-fit: none;
+  object-position: top left;
+  mix-blend-mode: normal;
+}
+
+html[data-blog-flight="open"]::view-transition-old(.blog-flight) {
+  animation: climb-fade-out 140ms var(--ease-out) both;
+}
+
+html[data-blog-flight="open"]::view-transition-new(.blog-flight) {
+  animation: fade-in 200ms ease both;
+}
+
+/* Closing: the card fades as the box shrinks, then the row is back. */
+html[data-blog-flight="close"]::view-transition-old(.blog-flight) {
+  animation: climb-fade-out 220ms var(--ease-out) both;
+}
+
+html[data-blog-flight="close"]::view-transition-new(.blog-flight) {
+  animation: fade-in 180ms ease 180ms both;
 }
 
 .book-stage {

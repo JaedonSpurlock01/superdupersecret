@@ -2,7 +2,6 @@ import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 import { Geist_Mono, Instrument_Sans } from "next/font/google";
 import "./globals.css";
-import { AppPreviousPathTracker } from "@/components/app-previous-path-tracker";
 import { DatabaseFeaturesProvider } from "@/components/database-features-provider";
 import { SessionProvider } from "@/components/session-provider";
 import { SpaceMode } from "@/components/space-mode";
@@ -71,7 +70,6 @@ export default async function RootLayout({
         <ThemeProvider>
           <SessionProvider>
             <DatabaseFeaturesProvider databaseAvailable={databaseAvailable}>
-              <AppPreviousPathTracker />
               <TooltipProvider>{children}</TooltipProvider>
               <SpaceMode />
             </DatabaseFeaturesProvider>

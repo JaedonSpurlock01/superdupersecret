@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import About from "@/components/about";
 import Books from "@/components/books";
 import Guestbook from "@/components/guestbook";
@@ -7,8 +8,25 @@ import Projects from "@/components/projects";
 import { RevealStack } from "@/components/reveal-stack";
 import { SectionRail } from "@/components/section-rail";
 import Writings from "@/components/writings";
+import { getBlogBySlug } from "@/lib/blog";
+import { isValidBlogSlug } from "@/lib/comments/slug";
 import { getGuestbookEntries } from "@/lib/guestbook/entries";
 import { getFavoriteTracks } from "@/lib/music";
+
+type HomeProps = {
+  searchParams: Promise<{ post?: string | string[] }>;
+};
+
+/** A link to a post (`/?post=<slug>`) previews as that post. */
+export async function generateMetadata({
+  searchParams,
+}: HomeProps): Promise<Metadata> {
+  const { post: slug } = await searchParams;
+  if (typeof slug !== "string" || !isValidBlogSlug(slug)) return {};
+  const post = await getBlogBySlug(slug);
+  if (!post) return {};
+  return { title: post.title, description: post.summary };
+}
 
 export default async function Home() {
   const [tracks, guestbook] = await Promise.all([
