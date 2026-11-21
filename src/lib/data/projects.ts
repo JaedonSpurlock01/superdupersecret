@@ -4,7 +4,10 @@ export type Project = {
   /** Public site. Without one the card isn't a link. */
   websiteUrl?: string;
   githubUrl?: string;
+  /** Still image. With `videoSrc` it's the poster shown until the video plays. */
   imageSrc: string;
+  /** Looping, muted demo video played in place of the image. */
+  videoSrc?: string;
   /** Screenshot for dark mode. Falls back to `imageSrc`. */
   imageSrcDark?: string;
   /** Logo beside the title, one file per theme (brand colours differ on light and dark). */
@@ -49,7 +52,8 @@ export const projects: Project[] = [
       "City pathfinding visualizer website used to visualize pathfinding algorithms",
     websiteUrl: "https://www.routify.cc",
     githubUrl: "https://www.github.com/jaedonspurlock01/routify",
-    imageSrc: "/projects/routify.gif",
+    imageSrc: "/projects/routify-poster.webp",
+    videoSrc: "/projects/routify.mp4",
     logo: {
       light: "/projects/routify-logo-light.svg",
       dark: "/projects/routify-logo-dark.svg",

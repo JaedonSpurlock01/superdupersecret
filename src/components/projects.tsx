@@ -238,27 +238,48 @@ function BrowserCard({ project }: { project: Project }) {
         </span>
       </div>
       <div className="relative aspect-video w-full overflow-hidden bg-muted">
-        {[
-          { src: project.imageSrc, theme: project.imageSrcDark && "light" },
-          project.imageSrcDark && { src: project.imageSrcDark, theme: "dark" },
-        ].map(
-          (img) =>
-            img && (
-              <Image
-                key={img.src}
-                src={img.src}
-                alt={project.title}
-                fill
-                sizes="(min-width: 768px) 50vw, 100vw"
-                className={cn(
-                  "object-cover object-top",
-                  img.theme === "light" && "dark:hidden",
-                  img.theme === "dark" && "hidden dark:block",
-                  project.websiteUrl &&
-                    "transition-transform duration-500 ease-(--ease-out) group-hover:scale-[1.02]",
-                )}
-              />
-            ),
+        {project.videoSrc ? (
+          <video
+            src={project.videoSrc}
+            poster={project.imageSrc}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-label={project.title}
+            className={cn(
+              "absolute inset-0 size-full object-cover object-top",
+              project.websiteUrl &&
+                "transition-transform duration-500 ease-(--ease-out) group-hover:scale-[1.02]",
+            )}
+          />
+        ) : (
+          [
+            { src: project.imageSrc, theme: project.imageSrcDark && "light" },
+            project.imageSrcDark && {
+              src: project.imageSrcDark,
+              theme: "dark",
+            },
+          ].map(
+            (img) =>
+              img && (
+                <Image
+                  key={img.src}
+                  src={img.src}
+                  alt={project.title}
+                  fill
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                  className={cn(
+                    "object-cover object-top",
+                    img.theme === "light" && "dark:hidden",
+                    img.theme === "dark" && "hidden dark:block",
+                    project.websiteUrl &&
+                      "transition-transform duration-500 ease-(--ease-out) group-hover:scale-[1.02]",
+                  )}
+                />
+              ),
+          )
         )}
       </div>
     </>
