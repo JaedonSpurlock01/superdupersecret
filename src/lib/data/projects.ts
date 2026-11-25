@@ -24,6 +24,7 @@ export const projects: Project[] = [
     title: "Somna",
     description:
       "Private, local-first dream journal that does two things well: recording dreams and analyzing them. No AI.",
+    websiteUrl: "https://somna.dev",
     imageSrc: "/projects/somna-light.webp",
     imageSrcDark: "/projects/somna-dark.webp",
     logo: {
@@ -50,7 +51,6 @@ export const projects: Project[] = [
     title: "Routify",
     description:
       "City pathfinding visualizer website used to visualize pathfinding algorithms",
-    websiteUrl: "https://www.routify.cc",
     githubUrl: "https://www.github.com/jaedonspurlock01/routify",
     imageSrc: "/projects/routify-poster.webp",
     videoSrc: "/projects/routify.mp4",
