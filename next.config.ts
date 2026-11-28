@@ -8,6 +8,12 @@ const nextConfig: NextConfig = {
     return [
       { source: "/blogs", destination: "/#writings", permanent: true },
       { source: "/blogs/:slug", destination: "/?post=:slug", permanent: true },
+      // Spurlock Labs has its own site now.
+      {
+        source: "/spurlock-labs/:path*",
+        destination: "https://spurlocklabs.com",
+        permanent: true,
+      },
     ];
   },
   images: {

@@ -14,8 +14,8 @@
     "position": "Founder",
     "location": "Remote",
     "date": "Present",
-    "imageSrc": "/spurlocklabs.jpeg",
-    "href": "/spurlock-labs",
+    "imageSrc": "/work/spurlocklabs.svg",
+    "href": "https://spurlocklabs.com",
     "description": "A simple SaaS for building products that help businesses and personal users.",
     "skills": ["react", "typescript"]
   },

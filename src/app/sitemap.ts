@@ -6,13 +6,7 @@ const siteUrl =
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticBase = [
-    "",
-    "/books",
-    "/spurlock-labs",
-    "/spurlock-labs/privacy",
-    "/spurlock-labs/terms",
-  ];
+  const staticBase = ["", "/books"];
   const staticRoutes = staticBase.map((route) => ({
     url: `${siteUrl}${route}`,
     lastModified: new Date().toISOString(),

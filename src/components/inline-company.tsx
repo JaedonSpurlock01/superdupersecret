@@ -34,9 +34,11 @@ export function InlineCompany({ name }: { name: string }) {
                 fill
                 sizes="18px"
                 className={
-                  latest.imageSrc.endsWith(".png")
-                    ? "object-contain p-px"
-                    : "object-cover"
+                  latest.imageSrc.endsWith(".svg")
+                    ? "object-contain p-0.5"
+                    : latest.imageSrc.endsWith(".png")
+                      ? "object-contain p-px"
+                      : "object-cover"
                 }
               />
             </span>
